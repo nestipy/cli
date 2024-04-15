@@ -1,0 +1,6 @@
+from nestipy.common import Module
+
+
+@Module()
+class {{name|capitalize}}Module:
+    ...
