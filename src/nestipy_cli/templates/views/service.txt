@@ -1,6 +1,6 @@
 from nestipy.common import Injectable
 
-from .{{name|lower}}_dto import Create{{name|capitalize}}Dto,Update{{name|capitalize}}Dto
+from .{{name|lower}}_dto import Create{{name|capitalize}}Dto, Update{{name|capitalize}}Dto
 
 
 @Injectable()

@@ -1,10 +1,10 @@
 import os.path
 
 import autoflake
+import autopep8
 import isort
 
 from .templates.generator import TemplateGenerator
-import autopep8
 
 
 class NestipyCliHandler:
@@ -25,7 +25,7 @@ class NestipyCliHandler:
         path = os.path.join(os.getcwd(), 'src', name)
         if not os.path.exists(path):
             os.mkdir(path)
-            open(os.path.join(path, 'interface.py'), 'a').close()
+            open(os.path.join(path, '__init__.py'), 'a').close()
         return path
 
     def generate_resource_api(self, name):
@@ -83,29 +83,36 @@ class NestipyCliHandler:
             with open(app_path, 'r') as file:
                 file_content = file.read()
                 file.close()
-                module_pattern = r'@Module\(\s*(.*?)\s*\)(?=\s*class\s+\w+\(.*\):)'
+                module_pattern = r'@Module\(([^)]+)\)'
 
                 text_to_add = f'from src.{name.lower()}.{name.lower()}_module import {name.capitalize()}Module'
                 import re
                 match = re.search(module_pattern, file_content, re.DOTALL)
                 if match:
-                    existing_imports_str = match.group(1)
-                    existing_imports_match = re.search(r'imports\s*=\s*\[\s*((?:[^][]|\[[^\]]*\])*)\s*]',
-                                                       existing_imports_str)
+                    existing_imports_str = match.group(1).replace('\n\n', '\n')
+                    existing_imports_match = re.search(
+                        r'imports\s*=\s*\[\s*((?:[^][]|\[[^\]]*\])*)\s*]',
+                        existing_imports_str
+                    )
                     if existing_imports_match:
                         existing_imports = existing_imports_match.group(1)
                         new_imports = existing_imports + ',\n\t' + new_import if not existing_imports.strip().endswith(
                             ',') else existing_imports + new_import
-                        modified_imports_str = re.sub(r'imports\s*=\s*\[\s*((?:[^][]|\[[^\]]*\])*)\s*]',
-                                                      '\n\timports=[\n\t' + new_imports + '\n]',
-                                                      existing_imports_str)
-                        modified_content = file_content.replace(match.group(0),
-                                                                text_to_add + '\n@Module(' + modified_imports_str + ')')
+                        modified_imports_str = re.sub(
+                            r'imports\s*=\s*\[\s*((?:[^][]|\[[^\]]*\])*)\s*]',
+                            '\n\timports=[\n\t' + new_imports + '\n]',
+                            existing_imports_str
+                        )
+                        modified_content = file_content.replace(
+                            match.group(0),
+                            text_to_add + '\n@Module(' + modified_imports_str.replace('\n\n', '\n') + ')'
+                        )
                     else:
                         # If imports=[] doesn't exist, add imports directly
-                        modified_content = file_content.replace(match.group(0),
-                                                                text_to_add + f'\n@Module(\n\timports=[{new_import}\n],'
-                                                                              f'{existing_imports_str})')
+                        modified_content = file_content.replace(
+                            match.group(0),
+                            text_to_add + f'\n@Module(\n\timports=[\n{new_import}\n],{existing_imports_str})'
+                        )
 
                     cleaned_code = autoflake.fix_code(modified_content)
                     sorted_code = isort.code(cleaned_code)
@@ -115,4 +122,4 @@ class NestipyCliHandler:
                         file2.close()
 
                 else:
-                    print("No @Module decorator found in the file.")
+                    print(f"No @Module decorator found in app_module.py.")
