@@ -1,4 +1,5 @@
-from nestipy.common.decorator import Module
+from nestipy.common import Module
+
 from app_controller import AppController
 from app_service import AppService
 

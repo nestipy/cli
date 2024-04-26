@@ -1,5 +1,5 @@
 from nestipy.common import Controller, Get, Post, Put, Delete
-from nestipy.types_ import Inject, Body, Params
+from nestipy_ioc import Inject, Body, Params
 
 from .{{name|lower}}_dto import Create{{name|capitalize}}Dto, Update{{name|capitalize}}Dto
 from .{{name|lower}}_service import {{name|capitalize}}Service
@@ -18,10 +18,10 @@ class {{name|capitalize}}Controller:
     async def create(self, data: Body[Create{{name|capitalize}}Dto]) -> str:
         return await self.{{name|lower}}_service.create(data)
 
-    @Put('/{{name|lower}}_id')
+    @Put('/{{'{'}}{{name|lower}}{{'_id}'}}')
     async def update(self, {{name|lower}}_id: Params[int], data: Body[Update{{name|capitalize}}Dto]) -> str:
         return await self.{{name|lower}}_service.update({{name|lower}}_id, data)
 
-    @Delete('/{{name|lower}}_id')
+    @Delete('/{{'{'}}{{name|lower}}{{'_id}'}}')
     async def delete(self, {{name|lower}}_id: Params[int] ) -> None:
         return await self.{{name|lower}}_service.delete({{name|lower}}_id)

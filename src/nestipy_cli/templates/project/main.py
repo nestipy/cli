@@ -1,7 +1,7 @@
 import uvicorn
 
 from app_module import AppModule
-from nestipy.core.nestipy_factory import NestipyFactory
+from nestipy.core import NestipyFactory
 
 app = NestipyFactory.create(AppModule)
 

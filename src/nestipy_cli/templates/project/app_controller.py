@@ -1,5 +1,5 @@
 from nestipy.common import Controller, Get, Post, Put, Delete
-from nestipy.types_ import Inject, Body, Params
+from nestipy_ioc import Inject, Body, Params
 
 from app_service import AppService
 
@@ -16,10 +16,10 @@ class AppController:
     async def post(self, data: Body[dict]) -> str:
         return await self.service.post(data=data)
 
-    @Put('/{user_id}')
-    async def put(self, user_id: Params[int], data: Body[dict]) -> str:
-        return await self.service.put(id_=user_id, data=data)
+    @Put('/{app_id}')
+    async def put(self, app_id: Params[int], data: Body[dict]) -> str:
+        return await self.service.put(id_=app_id, data=data)
 
-    @Delete('/{user_id}')
-    async def delete(self, user_id: Params[int]) -> None:
-        await self.service.delete(id_=user_id)
+    @Delete('/{app_id}')
+    async def delete(self, app_id: Params[int]) -> None:
+        await self.service.delete(id_=app_id)

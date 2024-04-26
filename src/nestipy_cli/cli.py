@@ -58,7 +58,7 @@ def module(name):
     echo.success(f"Module created successfully inside src/{name}.")
 
 
-@make.command()
+@make.command(aliases=['ctrl'])
 @click.argument('name')
 def controller(name):
     """ Create new controller """

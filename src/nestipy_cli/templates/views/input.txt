@@ -1,4 +1,4 @@
-from nestipy.plugins.strawberry_module.decorator import Input
+from nestipy.graphql.strawberry import Input
 
 
 @Input()

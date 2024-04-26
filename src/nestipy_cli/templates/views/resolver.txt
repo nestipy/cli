@@ -1,5 +1,6 @@
-from nestipy.types_ import Inject
-from nestipy.graphql.strawberry_module import Resolver, Query, Mutation
+from nestipy.graphql import Resolver, Query, Mutation
+from nestipy_ioc import Inject
+
 from .{{name|lower}}_input import {{name|capitalize}}Input
 from .{{name|lower}}_service import {{name|capitalize}}Service
 
