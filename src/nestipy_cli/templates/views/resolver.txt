@@ -1,5 +1,5 @@
 from nestipy.graphql import Resolver, Query, Mutation
-from nestipy_ioc import Inject
+from nestipy.ioc import Inject
 
 from .{{name|lower}}_input import {{name|capitalize}}Input
 from .{{name|lower}}_service import {{name|capitalize}}Service
