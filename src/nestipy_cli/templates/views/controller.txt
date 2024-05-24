@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from nestipy.common import Controller, Get, Post, Put, Delete
 from nestipy.ioc import Inject, Body, Params
 
@@ -8,20 +10,20 @@ from .{{name|lower}}_service import {{name|capitalize}}Service
 @Controller('{{name|lower}}s')
 class {{name|capitalize}}Controller:
 
-    {{name|lower}}_service:  Inject[{{name|capitalize}}Service]
+    {{name|lower}}_service:  Annotated[{{name|capitalize}}Service, Inject()]
 
     @Get()
     async def list(self) -> str:
         return await self.{{name|lower}}_service.list()
 
     @Post()
-    async def create(self, data: Body[Create{{name|capitalize}}Dto]) -> str:
+    async def create(self, data: Annotated[Create{{name|capitalize}}Dto, Body()]) -> str:
         return await self.{{name|lower}}_service.create(data)
 
     @Put('/{{'{'}}{{name|lower}}{{'_id}'}}')
-    async def update(self, {{name|lower}}_id: Params[int], data: Body[Update{{name|capitalize}}Dto]) -> str:
+    async def update(self, {{name|lower}}_id: Annotated[int, Params('{{name|lower}}_id')], data: Annotated[Update{{name|capitalize}}Dto, Body()]) -> str:
         return await self.{{name|lower}}_service.update({{name|lower}}_id, data)
 
     @Delete('/{{'{'}}{{name|lower}}{{'_id}'}}')
-    async def delete(self, {{name|lower}}_id: Params[int] ) -> None:
+    async def delete(self, {{name|lower}}_id: Annotated[int,Params('{{name|lower}}_id')] ) -> None:
         return await self.{{name|lower}}_service.delete({{name|lower}}_id)

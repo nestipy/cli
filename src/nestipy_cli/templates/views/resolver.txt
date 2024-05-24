@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from nestipy.graphql import Resolver, Query, Mutation
 from nestipy.ioc import Inject
 
@@ -8,7 +10,7 @@ from .{{name|lower}}_service import {{name|capitalize}}Service
 @Resolver()
 class {{name|capitalize}}Resolver:
 
-    {{name|lower}}_service: Inject[{{name|capitalize}}Service]
+    {{name|lower}}_service: Annotated[{{name|capitalize}}Service, Inject()]
 
     @Query()
     async def {{name|lower}}_test_query(self) -> str:
