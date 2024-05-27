@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from nestipy.common import Controller, Get, Post, Put, Delete
-from nestipy.ioc import Inject, Body, Params
+from nestipy.ioc import Inject, Body, Param
 
 from .{{name|lower}}_dto import Create{{name|capitalize}}Dto, Update{{name|capitalize}}Dto
 from .{{name|lower}}_service import {{name|capitalize}}Service
@@ -21,9 +21,9 @@ class {{name|capitalize}}Controller:
         return await self.{{name|lower}}_service.create(data)
 
     @Put('/{{'{'}}{{name|lower}}{{'_id}'}}')
-    async def update(self, {{name|lower}}_id: Annotated[int, Params('{{name|lower}}_id')], data: Annotated[Update{{name|capitalize}}Dto, Body()]) -> str:
+    async def update(self, {{name|lower}}_id: Annotated[int, Param('{{name|lower}}_id')], data: Annotated[Update{{name|capitalize}}Dto, Body()]) -> str:
         return await self.{{name|lower}}_service.update({{name|lower}}_id, data)
 
     @Delete('/{{'{'}}{{name|lower}}{{'_id}'}}')
-    async def delete(self, {{name|lower}}_id: Annotated[int,Params('{{name|lower}}_id')] ) -> None:
+    async def delete(self, {{name|lower}}_id: Annotated[int,Param('{{name|lower}}_id')] ) -> None:
         return await self.{{name|lower}}_service.delete({{name|lower}}_id)

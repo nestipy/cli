@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from nestipy.graphql import Resolver, Query, Mutation
-from nestipy.ioc import Inject
+from nestipy.ioc import Inject, Arg
 
 from .{{name|lower}}_input import {{name|capitalize}}Input
 from .{{name|lower}}_service import {{name|capitalize}}Service
@@ -17,5 +17,5 @@ class {{name|capitalize}}Resolver:
         return await self.{{name|lower}}_service.list()
 
     @Mutation()
-    async def {{name|lower}}_test_mutation(self,data: {{name|capitalize}}Input) -> str:
+    async def {{name|lower}}_test_mutation(self,data: Annotated[{{name|capitalize}}Input, Arg()]) -> str:
         return data.test

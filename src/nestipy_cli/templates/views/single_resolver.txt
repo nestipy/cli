@@ -1,4 +1,7 @@
 import strawberry
+from typing import Annotated
+
+from nestipy.ioc import Arg
 from nestipy.graphql import Resolver, Query, Mutation
 
 
@@ -10,5 +13,5 @@ class {{name|capitalize}}Resolver:
         return "test"
 
     @Mutation()
-    def {{name|lower}}_test_mutation(self,test: str) -> str:
+    def {{name|lower}}_test_mutation(self,test: Annotated[str, Arg()]) -> str:
         return test
