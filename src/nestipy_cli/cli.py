@@ -1,13 +1,15 @@
 import importlib
+import os.path
 import sys
 from pathlib import Path
 from subprocess import DEVNULL, check_call
-from yaspin import yaspin
-import click
 import questionary
+import rich_click as click
 import uvicorn
 from click_aliases import ClickAliasedGroup
+from yaspin import yaspin
 
+from .config import PROD_LOGGING_CONFIG
 from .handler import NestipyCliHandler
 from .style import CliStyle
 
@@ -48,19 +50,10 @@ def make():
 @click.option('-P', '--port', required=False, default=8000, help="Server port")
 @click.option('-H', '--host', required=False, default="0.0.0.0", help="Server host")
 @click.option('--workers', default=1, type=int, help='Number of worker processes.')
-def start(app_path: str, dev: bool, port: int, host: str, workers: int) -> None:
-    """ Start server
-    :param app_path:
-    :type app_path:
-    :param dev:
-    :type dev:
-    :param port:
-    :type port:
-    :param host:
-    :type host:
-    :param workers:
-    :type workers:
-    """
+@click.option('--ssl-keyfile', type=str, help='SSL certificate key.')
+@click.option('--ssl-cert-file', type=str, help='SSL certificate file.')
+def start(app_path: str, dev: bool, port: int, host: str, workers: int, ssl_keyfile: str, ssl_cert_file) -> None:
+    """ Starting nestipy server """
     try:
         import nestipy
     except ImportError:
@@ -77,7 +70,25 @@ def start(app_path: str, dev: bool, port: int, host: str, workers: int) -> None:
     sys.path.append(str(module_file_path.parent))
     m = importlib.import_module(module_name)
     app = getattr(m, app_name)
-    uvicorn.run(app_path, reload=dev, host=host, port=port, workers=workers)
+    config = uvicorn.config.LOGGING_CONFIG
+    if not dev:
+        config = PROD_LOGGING_CONFIG
+        log_dir = os.path.join(os.getcwd(), 'logs')
+        if not os.path.exists(log_dir):
+            os.mkdir(log_dir)
+            open(os.path.join(log_dir, 'default.log'), 'a').close()
+            open(os.path.join(log_dir, 'access.log'), 'a').close()
+    uvicorn.run(
+        app_path,
+        reload=dev,
+        host=host,
+        port=port,
+        workers=workers,
+        log_config=config,
+        ssl_keyfile=ssl_keyfile,
+        ssl_certfile=ssl_cert_file,
+        use_colors=True
+    )
 
 
 @make.command(name='resource', aliases=['r', 'res'])
