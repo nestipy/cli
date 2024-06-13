@@ -15,7 +15,9 @@ class NestipyCliHandler:
 
     def create_project(self, name) -> bool:
         destination = os.path.join(os.getcwd(), name)
-        if os.path.exists(destination):
+        if name == '.':
+            destination = os.getcwd()
+        if os.path.exists(destination) and name != '.':
             return False
         self.generator.copy_project(destination)
         return True

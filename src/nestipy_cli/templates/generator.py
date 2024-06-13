@@ -35,4 +35,4 @@ class TemplateGenerator:
 
     @classmethod
     def copy_project(cls, destination):
-        shutil.copytree(os.path.join(os.path.dirname(__file__), 'project'), destination)
+        shutil.copytree(os.path.join(os.path.dirname(__file__), 'project'), destination, dirs_exist_ok=True)
