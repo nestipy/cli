@@ -3,15 +3,23 @@ import os.path
 import sys
 from pathlib import Path
 from subprocess import DEVNULL, check_call
+
 import questionary
 import rich_click as click
 import uvicorn
 from click_aliases import ClickAliasedGroup
+from rich.box import ROUNDED
+from rich.console import Console
+from rich.panel import Panel
+from rich.style import Style
+from rich.text import Text
 from yaspin import yaspin
 
-from .config import PROD_LOGGING_CONFIG
+from .config import LOGGING_CONFIG, PROD_LOGGER
 from .handler import NestipyCliHandler
 from .style import CliStyle
+
+console = Console()
 
 handler = NestipyCliHandler()
 echo = CliStyle()
@@ -70,14 +78,38 @@ def start(app_path: str, dev: bool, port: int, host: str, workers: int, ssl_keyf
     sys.path.append(str(module_file_path.parent))
     m = importlib.import_module(module_name)
     app = getattr(m, app_name)
-    config = uvicorn.config.LOGGING_CONFIG
+    config = LOGGING_CONFIG
     if not dev:
-        config = PROD_LOGGING_CONFIG
+        config["loggers"] = PROD_LOGGER
         log_dir = os.path.join(os.getcwd(), 'logs')
         if not os.path.exists(log_dir):
             os.mkdir(log_dir)
             open(os.path.join(log_dir, 'default.log'), 'a').close()
             open(os.path.join(log_dir, 'access.log'), 'a').close()
+    environment = 'Development' if dev else 'Production'
+    scheme = 'https' if ssl_cert_file else 'http'
+    multiline_text = Text(style=Style(color='green'))
+    multiline_text.append(f"Serving at: {scheme}://{host}:{port}\n")
+    multiline_text.append(f"Running in {environment.lower()} mode")
+    if dev:
+        multiline_text.append("\nFor production, use : ")
+        multiline_text.append("nestipy start", Style(bold=True, color='green'))
+    panel = Panel(
+        multiline_text,
+        title=f"Nestipy CLI - {environment} mode",
+        box=ROUNDED,
+        border_style=Style(
+            bold=True,
+            encircle=True,
+            color='green',
+            dim=True,
+        ),
+        width=50,
+        padding=(0, 1, 0, 6),
+        highlight=True,
+        style=Style(color='green')
+    )
+    console.print(panel)
     uvicorn.run(
         app_path,
         reload=dev,
