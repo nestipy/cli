@@ -18,10 +18,10 @@ class AppController:
     async def post(self, data: Annotated[dict, Body()]) -> str:
         return await self.service.post(data=data)
 
-    @Put('/{app_id}')
-    async def put(self, app_id: Annotated[int, Param('app_id')], data: Annotated[dict, Body()]) -> str:
-        return await self.service.put(id_=app_id, data=data)
+    @Put('/{id}')
+    async def put(self, _id: Annotated[int, Param('id')], data: Annotated[dict, Body()]) -> str:
+        return await self.service.put(id_=_id, data=data)
 
-    @Delete('/{app_id}')
-    async def delete(self, app_id: Annotated[int, Param('app_id')]) -> None:
-        await self.service.delete(id_=app_id)
+    @Delete('/{id}')
+    async def delete(self, _id: Annotated[int, Param('id')]) -> None:
+        await self.service.delete(id_=_id)
