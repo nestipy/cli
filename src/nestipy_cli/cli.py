@@ -1,3 +1,4 @@
+import asyncio
 import importlib
 import os.path
 import sys
@@ -60,7 +61,15 @@ def make():
 @click.option('--workers', default=1, type=int, help='Number of worker processes.')
 @click.option('--ssl-keyfile', type=str, help='SSL certificate key.')
 @click.option('--ssl-cert-file', type=str, help='SSL certificate file.')
-def start(app_path: str, dev: bool, port: int, host: str, workers: int, ssl_keyfile: str, ssl_cert_file) -> None:
+def start(
+        app_path: str,
+        dev: bool,
+        port: int,
+        host: str,
+        workers: int,
+        ssl_keyfile: str,
+        ssl_cert_file
+) -> None:
     """ Starting nestipy server """
     try:
         import nestipy
@@ -78,6 +87,8 @@ def start(app_path: str, dev: bool, port: int, host: str, workers: int, ssl_keyf
     sys.path.append(str(module_file_path.parent))
     m = importlib.import_module(module_name)
     app = getattr(m, app_name)
+    from nestipy.core import NestipyMicroservice
+    is_ms: bool = isinstance(app, NestipyMicroservice)
     config = LOGGING_CONFIG
     if not dev:
         config["loggers"] = PROD_LOGGER
@@ -94,6 +105,9 @@ def start(app_path: str, dev: bool, port: int, host: str, workers: int, ssl_keyf
     if dev:
         multiline_text.append("\nFor production, use : ")
         multiline_text.append("nestipy start", Style(bold=True, color='green'))
+        if is_ms:
+            multiline_text.append("\nMicroservice server running ...", Style(bold=True, color='green'))
+
     panel = Panel(
         multiline_text,
         title=f"Nestipy CLI - {environment} mode",
@@ -110,17 +124,20 @@ def start(app_path: str, dev: bool, port: int, host: str, workers: int, ssl_keyf
         style=Style(color='green')
     )
     console.print(panel)
-    uvicorn.run(
-        app_path,
-        reload=dev,
-        host=host,
-        port=port,
-        workers=workers,
-        log_config=config,
-        ssl_keyfile=ssl_keyfile,
-        ssl_certfile=ssl_cert_file,
-        use_colors=True
-    )
+    if not is_ms:
+        uvicorn.run(
+            app_path,
+            reload=dev,
+            host=host,
+            port=port,
+            workers=workers,
+            log_config=config,
+            ssl_keyfile=ssl_keyfile,
+            ssl_certfile=ssl_cert_file,
+            use_colors=True
+        )
+    else:
+        asyncio.run(app.start())
 
 
 @make.command(name='resource', aliases=['r', 'res'])
