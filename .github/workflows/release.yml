@@ -44,7 +44,7 @@ jobs:
         id: load_version
         run: |
           version=$(poetry version | awk '{ print $2 }') &&
-          poetry version $version && echo "tag=v$version" >> "$GITHUB_OUTPUT"
+          poetry version $version && echo "tag=$version" >> "$GITHUB_OUTPUT"
 
       - name: Build package
         run: |
