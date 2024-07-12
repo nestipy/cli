@@ -1,6 +1,7 @@
 import asyncio
 import importlib
 import os.path
+import random
 import sys
 from pathlib import Path
 from subprocess import DEVNULL, check_call
@@ -53,6 +54,9 @@ def make():
     pass
 
 
+current_task = None
+
+
 @main.command(name="start")
 @click.argument('app_path', default='main:app')
 @click.option('-D', '--dev', is_flag=True, default=False, help="Development server")
@@ -80,15 +84,21 @@ def start(
             check_call([sys.executable, "-m", "pip", "install", "nestipy", "--upgrade"], stdout=DEVNULL)
             spinner.color = 'green'
             spinner.ok("✔")
+        importlib.import_module("nestipy")
 
     module_path, app_name = app_path.split(":")
     module_file_path = Path(module_path).resolve()
     module_name = module_file_path.stem
     sys.path.append(str(module_file_path.parent))
-    m = importlib.import_module(module_name)
-    app = getattr(m, app_name)
-    from nestipy.core import NestipyMicroservice
-    is_ms: bool = isinstance(app, NestipyMicroservice)
+
+    def import_app():
+        mod = importlib.import_module(module_name)
+        app_ = getattr(mod, app_name)
+        return mod, app_
+
+    m, app = import_app()
+    from nestipy.core import NestipyMicroservice, NestipyApplication
+    is_ms: bool = isinstance(app, NestipyMicroservice) and not isinstance(app, NestipyApplication)
     config = LOGGING_CONFIG
     if not dev:
         config["loggers"] = PROD_LOGGER
@@ -100,13 +110,14 @@ def start(
     environment = 'Development' if dev else 'Production'
     scheme = 'https' if ssl_cert_file else 'http'
     multiline_text = Text(style=Style(color='green'))
-    multiline_text.append(f"Serving at: {scheme}://{host}:{port}\n")
-    multiline_text.append(f"Running in {environment.lower()} mode")
+    if is_ms:
+        multiline_text.append("Microservice server running ...", Style(bold=True, color='green'))
+    else:
+        multiline_text.append(f"Serving at: {scheme}://{host}:{port}")
+    multiline_text.append(f"\nRunning in {environment.lower()} mode")
     if dev:
         multiline_text.append("\nFor production, use : ")
         multiline_text.append("nestipy start", Style(bold=True, color='green'))
-        if is_ms:
-            multiline_text.append("\nMicroservice server running ...", Style(bold=True, color='green'))
 
     panel = Panel(
         multiline_text,
@@ -124,20 +135,23 @@ def start(
         style=Style(color='green')
     )
     console.print(panel)
-    if not is_ms:
-        uvicorn.run(
-            app_path,
-            reload=dev,
-            host=host,
-            port=port,
-            workers=workers,
-            log_config=config,
-            ssl_keyfile=ssl_keyfile,
-            ssl_certfile=ssl_cert_file,
-            use_colors=True
-        )
-    else:
+    if is_ms and not dev:
         asyncio.run(app.start())
+
+    uvicorn.run(
+        app_path,
+        reload=dev,
+        host=host,
+        port=port if not is_ms else random.randint(5000, 7000),
+        workers=workers,
+        log_config=config,
+        lifespan="on" if is_ms else "auto",
+        log_level="critical" if is_ms else None,
+        access_log=False if is_ms else None,
+        ssl_keyfile=ssl_keyfile,
+        ssl_certfile=ssl_cert_file,
+        use_colors=True
+    )
 
 
 @make.command(name='resource', aliases=['r', 'res'])

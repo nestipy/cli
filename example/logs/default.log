@@ -1,0 +1,298 @@
+[32m[NESTIPY] INFO[0m: Started server process [[36m37443[0m]
+[32m[NESTIPY] INFO[0m: Waiting for application startup.
+[32m[NESTIPY] INFO[0m: Application startup complete.
+[31m[NESTIPY] ERROR[0m: [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m: Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m: Application shutdown complete.
+[32m[NESTIPY] INFO[0m: Started server process [[36m37534[0m]
+[32m[NESTIPY] INFO[0m: Waiting for application startup.
+[32m[NESTIPY] INFO[0m: Application startup complete.
+[31m[NESTIPY] ERROR[0m: [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m: Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m: Application shutdown complete.
+2024-06-13 17:37:53,837 - uvicorn.error - [32m[NESTIPY] INFO[0m: Started server process [[36m37725[0m]
+2024-06-13 17:37:53,837 - uvicorn.error - [32m[NESTIPY] INFO[0m: Waiting for application startup.
+2024-06-13 17:37:53,839 - uvicorn.error - [32m[NESTIPY] INFO[0m: Application startup complete.
+2024-06-13 17:37:53,839 - uvicorn.error - [31m[NESTIPY] ERROR[0m: [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+2024-06-13 17:37:53,839 - uvicorn.error - [32m[NESTIPY] INFO[0m: Waiting for application shutdown.
+2024-06-13 17:37:53,839 - uvicorn.error - [32m[NESTIPY] INFO[0m: Application shutdown complete.
+[32m[NESTIPY] INFO[0m: 2024-06-13 17:38:20,367 Started server process [[36m37821[0m]
+[32m[NESTIPY] INFO[0m: 2024-06-13 17:38:20,367 Waiting for application startup.
+[32m[NESTIPY] INFO[0m: 2024-06-13 17:38:20,369 Application startup complete.
+[31m[NESTIPY] ERROR[0m: 2024-06-13 17:38:20,369 [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m: 2024-06-13 17:38:20,370 Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m: 2024-06-13 17:38:20,370 Application shutdown complete.
+[32m[NESTIPY] INFO[0m: 2024-06-13 17:39:37,364   Started server process [[36m38258[0m]
+[32m[NESTIPY] INFO[0m: 2024-06-13 17:39:37,365   Waiting for application startup.
+[32m[NESTIPY] INFO[0m: 2024-06-13 17:39:37,366   Application startup complete.
+[31m[NESTIPY] ERROR[0m: 2024-06-13 17:39:37,367   [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m: 2024-06-13 17:39:37,367   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m: 2024-06-13 17:39:37,367   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   2024-06-13 17:41:10   Started server process [[36m38576[0m]
+[32m[NESTIPY] INFO[0m:   2024-06-13 17:41:10   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024-06-13 17:41:10   Application startup complete.
+[31m[NESTIPY] ERROR[0m:   2024-06-13 17:41:10   [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m:   2024-06-13 17:41:10   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m:   2024-06-13 17:41:10   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13 17:41:36   Started server process [[36m38688[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13 17:41:36   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13 17:41:36   Application startup complete.
+[31m[NESTIPY] ERROR[0m:   2024/06/13 17:41:36   [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m:   2024/06/13 17:41:36   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m:   2024/06/13 17:41:36   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:41:44   Started server process [[36m38746[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:41:44   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:41:44   Application startup complete.
+[31m[NESTIPY] ERROR[0m:   2024/06/13, 17:41:44   [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:41:44   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:41:44   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   __ 2024/06/13, 17:42:05   Started server process [[36m38853[0m]
+[32m[NESTIPY] INFO[0m:   __ 2024/06/13, 17:42:05   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   __ 2024/06/13, 17:42:05   Application startup complete.
+[31m[NESTIPY] ERROR[0m:   __ 2024/06/13, 17:42:05   [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m:   __ 2024/06/13, 17:42:05   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m:   __ 2024/06/13, 17:42:05   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:42:34   Started server process [[36m38995[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:42:34   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:42:34   Application startup complete.
+[31m[NESTIPY] ERROR[0m:   2024/06/13, 17:42:34   [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:42:34   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:42:34   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:42:43   Started server process [[36m39054[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:42:43   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:42:43   Application startup complete.
+[31m[NESTIPY] ERROR[0m:   2024/06/13, 17:42:43   [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:42:43   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:42:43   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:43:18   Started server process [[36m39170[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:43:18   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:43:18   Application startup complete.
+[31m[NESTIPY] ERROR[0m:   2024/06/13, 17:43:18   [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:43:18   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:43:18   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:43:50   Started server process [[36m39323[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:43:50   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:43:50   Application startup complete.
+[31m[NESTIPY] ERROR[0m:   2024/06/13, 17:43:50   [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:43:50   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:43:50   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:43:58   Started server process [[36m39382[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:43:58   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:43:58   Application startup complete.
+[31m[NESTIPY] ERROR[0m:   2024/06/13, 17:43:58   [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:43:58   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:43:58   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:44:28   Started server process [[36m39527[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:44:28   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:44:28   Application startup complete.
+[31m[NESTIPY] ERROR[0m:   2024/06/13, 17:44:28   [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:44:28   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:44:28   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:44:41   Started server process [[36m39582[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:44:41   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:44:41   Application startup complete.
+[31m[NESTIPY] ERROR[0m:   2024/06/13, 17:44:41   [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:44:41   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:44:41   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:44:46   Started server process [[36m39680[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:44:46   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:44:46   Application startup complete.
+[31m[NESTIPY] ERROR[0m:   2024/06/13, 17:44:46   [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:44:46   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:44:46   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:46:27   Started server process [[36m40503[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:46:27   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:46:27   Application startup complete.
+[31m[NESTIPY] ERROR[0m:   2024/06/13, 17:46:27   [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:46:27   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:46:27   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:49:00   Started server process [[36m40973[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:49:00   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:49:00   Application startup complete.
+[31m[NESTIPY] ERROR[0m:   2024/06/13, 17:49:00   [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:49:00   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:49:00   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:51:52   Started server process [[36m42035[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:51:52   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:51:52   Application startup complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:51:52   Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:55:31   Shutting down
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:55:31   Finished server process [[36m42035[0m]
+[31m[NESTIPY] ERROR[0m:   2024/06/13, 17:55:31   Traceback (most recent call last):
+  File "/usr/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "uvloop/loop.pyx", line 1511, in uvloop.loop.Loop.run_until_complete
+  File "uvloop/loop.pyx", line 1504, in uvloop.loop.Loop.run_until_complete
+  File "uvloop/loop.pyx", line 1377, in uvloop.loop.Loop.run_forever
+  File "uvloop/loop.pyx", line 555, in uvloop.loop.Loop._run
+  File "uvloop/loop.pyx", line 474, in uvloop.loop.Loop._on_idle
+  File "uvloop/cbhandles.pyx", line 83, in uvloop.loop.Handle._run
+  File "uvloop/cbhandles.pyx", line 63, in uvloop.loop.Handle._run
+  File "/home/tsiresy/.cache/pypoetry/virtualenvs/nestipy-cli-wpZc_227-py3.11/lib/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+    with self.capture_signals():
+  File "/usr/lib/python3.11/contextlib.py", line 144, in __exit__
+    next(self.gen)
+  File "/home/tsiresy/.cache/pypoetry/virtualenvs/nestipy-cli-wpZc_227-py3.11/lib/python3.11/site-packages/uvicorn/server.py", line 328, in capture_signals
+    signal.raise_signal(captured_signal)
+  File "/usr/lib/python3.11/asyncio/runners.py", line 157, in _on_sigint
+    raise KeyboardInterrupt()
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/tsiresy/.cache/pypoetry/virtualenvs/nestipy-cli-wpZc_227-py3.11/lib/python3.11/site-packages/starlette/routing.py", line 741, in lifespan
+    await receive()
+  File "/home/tsiresy/.cache/pypoetry/virtualenvs/nestipy-cli-wpZc_227-py3.11/lib/python3.11/site-packages/uvicorn/lifespan/on.py", line 137, in receive
+    return await self.receive_queue.get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/asyncio/queues.py", line 158, in get
+    await getter
+asyncio.exceptions.CancelledError
+
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:55:35   Started server process [[36m43914[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:55:35   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:55:35   Application startup complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:55:35   Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:55:58   Shutting down
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:55:58   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:55:58   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:55:58   Finished server process [[36m43914[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:56:05   Started server process [[36m44059[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:56:05   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:56:05   Application startup complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:56:05   Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:57:09   Shutting down
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:57:09   Finished server process [[36m44059[0m]
+[31m[NESTIPY] ERROR[0m:   2024/06/13, 17:57:09   Traceback (most recent call last):
+  File "/usr/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "uvloop/loop.pyx", line 1511, in uvloop.loop.Loop.run_until_complete
+  File "uvloop/loop.pyx", line 1504, in uvloop.loop.Loop.run_until_complete
+  File "uvloop/loop.pyx", line 1377, in uvloop.loop.Loop.run_forever
+  File "uvloop/loop.pyx", line 555, in uvloop.loop.Loop._run
+  File "uvloop/loop.pyx", line 474, in uvloop.loop.Loop._on_idle
+  File "uvloop/cbhandles.pyx", line 83, in uvloop.loop.Handle._run
+  File "uvloop/cbhandles.pyx", line 63, in uvloop.loop.Handle._run
+  File "/home/tsiresy/.cache/pypoetry/virtualenvs/nestipy-cli-wpZc_227-py3.11/lib/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+    with self.capture_signals():
+  File "/usr/lib/python3.11/contextlib.py", line 144, in __exit__
+    next(self.gen)
+  File "/home/tsiresy/.cache/pypoetry/virtualenvs/nestipy-cli-wpZc_227-py3.11/lib/python3.11/site-packages/uvicorn/server.py", line 328, in capture_signals
+    signal.raise_signal(captured_signal)
+  File "/usr/lib/python3.11/asyncio/runners.py", line 157, in _on_sigint
+    raise KeyboardInterrupt()
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/tsiresy/.cache/pypoetry/virtualenvs/nestipy-cli-wpZc_227-py3.11/lib/python3.11/site-packages/starlette/routing.py", line 741, in lifespan
+    await receive()
+  File "/home/tsiresy/.cache/pypoetry/virtualenvs/nestipy-cli-wpZc_227-py3.11/lib/python3.11/site-packages/uvicorn/lifespan/on.py", line 137, in receive
+    return await self.receive_queue.get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/asyncio/queues.py", line 158, in get
+    await getter
+asyncio.exceptions.CancelledError
+
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:57:12   Started server process [[36m44222[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:57:12   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:57:12   Application startup complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 17:57:12   Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+[32m[NESTIPY] INFO[0m:   2024/06/13, 18:01:59   Shutting down
+[32m[NESTIPY] INFO[0m:   2024/06/13, 18:02:00   Finished server process [[36m44222[0m]
+[31m[NESTIPY] ERROR[0m:   2024/06/13, 18:02:00   Traceback (most recent call last):
+  File "/usr/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "uvloop/loop.pyx", line 1511, in uvloop.loop.Loop.run_until_complete
+  File "uvloop/loop.pyx", line 1504, in uvloop.loop.Loop.run_until_complete
+  File "uvloop/loop.pyx", line 1377, in uvloop.loop.Loop.run_forever
+  File "uvloop/loop.pyx", line 555, in uvloop.loop.Loop._run
+  File "uvloop/loop.pyx", line 474, in uvloop.loop.Loop._on_idle
+  File "uvloop/cbhandles.pyx", line 83, in uvloop.loop.Handle._run
+  File "uvloop/cbhandles.pyx", line 63, in uvloop.loop.Handle._run
+  File "/home/tsiresy/.cache/pypoetry/virtualenvs/nestipy-cli-wpZc_227-py3.11/lib/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+    with self.capture_signals():
+  File "/usr/lib/python3.11/contextlib.py", line 144, in __exit__
+    next(self.gen)
+  File "/home/tsiresy/.cache/pypoetry/virtualenvs/nestipy-cli-wpZc_227-py3.11/lib/python3.11/site-packages/uvicorn/server.py", line 328, in capture_signals
+    signal.raise_signal(captured_signal)
+  File "/usr/lib/python3.11/asyncio/runners.py", line 157, in _on_sigint
+    raise KeyboardInterrupt()
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/tsiresy/.cache/pypoetry/virtualenvs/nestipy-cli-wpZc_227-py3.11/lib/python3.11/site-packages/starlette/routing.py", line 741, in lifespan
+    await receive()
+  File "/home/tsiresy/.cache/pypoetry/virtualenvs/nestipy-cli-wpZc_227-py3.11/lib/python3.11/site-packages/uvicorn/lifespan/on.py", line 137, in receive
+    return await self.receive_queue.get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/asyncio/queues.py", line 158, in get
+    await getter
+asyncio.exceptions.CancelledError
+
+[32m[NESTIPY] INFO[0m:   2024/06/13, 18:07:01   Started server process [[36m46135[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 18:07:01   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 18:07:01   Application startup complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 18:07:01   Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+[32m[NESTIPY] INFO[0m:   2024/06/13, 18:07:38   Shutting down
+[32m[NESTIPY] INFO[0m:   2024/06/13, 18:07:38   Finished server process [[36m46135[0m]
+[31m[NESTIPY] ERROR[0m:   2024/06/13, 18:07:38   Traceback (most recent call last):
+  File "/usr/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "uvloop/loop.pyx", line 1511, in uvloop.loop.Loop.run_until_complete
+  File "uvloop/loop.pyx", line 1504, in uvloop.loop.Loop.run_until_complete
+  File "uvloop/loop.pyx", line 1377, in uvloop.loop.Loop.run_forever
+  File "uvloop/loop.pyx", line 555, in uvloop.loop.Loop._run
+  File "uvloop/loop.pyx", line 474, in uvloop.loop.Loop._on_idle
+  File "uvloop/cbhandles.pyx", line 83, in uvloop.loop.Handle._run
+  File "uvloop/cbhandles.pyx", line 63, in uvloop.loop.Handle._run
+  File "/home/tsiresy/.cache/pypoetry/virtualenvs/nestipy-cli-wpZc_227-py3.11/lib/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+    with self.capture_signals():
+  File "/usr/lib/python3.11/contextlib.py", line 144, in __exit__
+    next(self.gen)
+  File "/home/tsiresy/.cache/pypoetry/virtualenvs/nestipy-cli-wpZc_227-py3.11/lib/python3.11/site-packages/uvicorn/server.py", line 328, in capture_signals
+    signal.raise_signal(captured_signal)
+  File "/usr/lib/python3.11/asyncio/runners.py", line 157, in _on_sigint
+    raise KeyboardInterrupt()
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/tsiresy/.cache/pypoetry/virtualenvs/nestipy-cli-wpZc_227-py3.11/lib/python3.11/site-packages/starlette/routing.py", line 741, in lifespan
+    await receive()
+  File "/home/tsiresy/.cache/pypoetry/virtualenvs/nestipy-cli-wpZc_227-py3.11/lib/python3.11/site-packages/uvicorn/lifespan/on.py", line 137, in receive
+    return await self.receive_queue.get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/asyncio/queues.py", line 158, in get
+    await getter
+asyncio.exceptions.CancelledError
+
+[32m[NESTIPY] INFO[0m:   2024/06/13, 18:07:40   Started server process [[36m46337[0m]
+[32m[NESTIPY] INFO[0m:   2024/06/13, 18:07:40   Waiting for application startup.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 18:07:40   Application startup complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 18:07:40   Uvicorn running on [1mhttp://0.0.0.0:8000[0m (Press CTRL+C to quit)
+[32m[NESTIPY] INFO[0m:   2024/06/13, 18:08:45   Shutting down
+[32m[NESTIPY] INFO[0m:   2024/06/13, 18:08:45   Waiting for application shutdown.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 18:08:45   Application shutdown complete.
+[32m[NESTIPY] INFO[0m:   2024/06/13, 18:08:45   Finished server process [[36m46337[0m]

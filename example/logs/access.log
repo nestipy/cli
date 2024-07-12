@@ -1,0 +1,24 @@
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:54:54  127.0.0.1:46914 - "[1mGET / HTTP/1.1[0m" [32m200 OK[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:54:55  127.0.0.1:46914 - "[1mGET /favicon.ico HTTP/1.1[0m" [31m405 Method Not Allowed[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:55:38  [HTTP] 127.0.0.1:41646 - "[1mGET / HTTP/1.1[0m" [32m200 OK[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:55:38  [HTTP] 127.0.0.1:41646 - "[1mGET /favicon.ico HTTP/1.1[0m" [31m405 Method Not Allowed[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:55:49  [HTTP] 127.0.0.1:36550 - "[1mGET / HTTP/1.1[0m" [32m200 OK[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:55:49  [HTTP] 127.0.0.1:36550 - "[1mGET /favicon.ico HTTP/1.1[0m" [31m405 Method Not Allowed[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:55:50  [HTTP] 127.0.0.1:36550 - "[1mGET / HTTP/1.1[0m" [32m200 OK[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:55:50  [HTTP] 127.0.0.1:36550 - "[1mGET /favicon.ico HTTP/1.1[0m" [31m405 Method Not Allowed[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:55:52  [HTTP] 127.0.0.1:36550 - "[1mGET / HTTP/1.1[0m" [32m200 OK[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:55:52  [HTTP] 127.0.0.1:36550 - "[1mGET /favicon.ico HTTP/1.1[0m" [31m405 Method Not Allowed[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:56:12  [HTTP] 127.0.0.1:44562 - "[1mGET / HTTP/1.1[0m" [32m200 OK[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:56:12  [HTTP] 127.0.0.1:44562 - "[1mGET /favicon.ico HTTP/1.1[0m" [31m405 Method Not Allowed[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:56:23  [HTTP] 127.0.0.1:33698 - "[1mGET /est HTTP/1.1[0m" [31m405 Method Not Allowed[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:56:23  [HTTP] 127.0.0.1:33698 - "[1mGET /favicon.ico HTTP/1.1[0m" [31m405 Method Not Allowed[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:56:38  [HTTP] 127.0.0.1:59722 - "[1mGET /test HTTP/1.1[0m" [31m405 Method Not Allowed[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:56:38  [HTTP] 127.0.0.1:59722 - "[1mGET /favicon.ico HTTP/1.1[0m" [31m405 Method Not Allowed[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:57:14  ([HTTP])s 127.0.0.1:45080 - "[1mGET /test HTTP/1.1[0m" [31m405 Method Not Allowed[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:57:14  ([HTTP])s 127.0.0.1:45080 - "[1mGET /favicon.ico HTTP/1.1[0m" [31m405 Method Not Allowed[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:58:19  ([HTTP])s 127.0.0.1:33106 - "[1mGET /test HTTP/1.1[0m" [31m405 Method Not Allowed[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 17:58:19  ([HTTP])s 127.0.0.1:33106 - "[1mGET /favicon.ico HTTP/1.1[0m" [31m405 Method Not Allowed[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 18:08:33  127.0.0.1:60754 - "[1mGET / HTTP/1.1[0m" [32m200 OK[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 18:08:33  127.0.0.1:60754 - "[1mGET /favicon.ico HTTP/1.1[0m" [31m405 Method Not Allowed[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 18:08:41  127.0.0.1:60762 - "[1mGET /test HTTP/1.1[0m" [31m405 Method Not Allowed[0m
+[32m[NESTIPY] INFO[0m:  2024/06/13, 18:08:41  127.0.0.1:60762 - "[1mGET /favicon.ico HTTP/1.1[0m" [31m405 Method Not Allowed[0m
