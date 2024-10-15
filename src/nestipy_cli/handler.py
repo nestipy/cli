@@ -1,4 +1,5 @@
 import os.path
+import re
 
 import autoflake
 import autopep8
@@ -78,50 +79,62 @@ class NestipyCliHandler:
 
     @classmethod
     def modify_app_module(cls, name):
-        name = str(name)
+        module_name = str(name).capitalize() + "Module"
         app_path = os.path.join(os.getcwd(), 'app_module.py')
+        new_import_statement = f'from src.{name.lower()}.{name.lower()}_module import {module_name}'
+
         if os.path.exists(app_path):
-            new_import = f"{str(name).capitalize()}Module"
             with open(app_path, 'r') as file:
                 file_content = file.read()
-                file.close()
-                module_pattern = r'@Module\(([^)]+)\)'
+            # Check if the import statement already exists; if not, add it
+            if new_import_statement not in file_content:
+                file_content = new_import_statement + '\n' + file_content
 
-                text_to_add = f'from src.{name.lower()}.{name.lower()}_module import {name.capitalize()}Module'
-                import re
-                match = re.search(module_pattern, file_content, re.DOTALL)
-                if match:
-                    existing_imports_str = match.group(1).replace('\n\n', '\n')
-                    existing_imports_match = re.search(
-                        r'imports\s*=\s*\[\s*((?:[^][]|\[[^\]]*\])*)\s*]',
-                        existing_imports_str
-                    )
-                    if existing_imports_match:
-                        existing_imports = existing_imports_match.group(1)
-                        new_imports = existing_imports + ',\n\t' + new_import if not existing_imports.strip().endswith(
-                            ',') else existing_imports + new_import
-                        modified_imports_str = re.sub(
-                            r'imports\s*=\s*\[\s*((?:[^][]|\[[^\]]*\])*)\s*]',
-                            '\n\timports=[\n\t' + new_imports + '\n]',
-                            existing_imports_str
-                        )
-                        modified_content = file_content.replace(
-                            match.group(0),
-                            text_to_add + '\n@Module(' + modified_imports_str.replace('\n\n', '\n') + ')'
+            # Match the @Module decorator
+            module_pattern = r'@Module\s*\(\s*(.*?)\s*\)\s*class'
+            match = re.search(module_pattern, file_content, re.DOTALL)
+
+            if match:
+                # Extract the current content inside the @Module decorator
+                module_body = match.group(1)
+                # Search for the 'imports' property in the @Module body
+                imports_match = re.search(
+                    r'imports\s*=\s*\[\s*((?:[^\[\]]+|\[[^\[\]]*\])*)\s*\]',
+                    module_body, re.DOTALL
+                )
+
+                if imports_match:
+                    # 'imports' exists; extract its content
+                    imports_content = imports_match.group(1).strip()
+
+                    # If the module is not already in the imports, add it
+                    if module_name not in imports_content:
+                        if imports_content and not imports_content.endswith(','):
+                            imports_content += ','  # Ensure comma before adding new import
+
+                        new_imports = f'{imports_content}\n\t{module_name}'
+                        updated_module_body = re.sub(
+                            r'imports\s*=\s*\[\s*((?:[^\[\]]+|\[[^\[\]]*\])*)\s*\]',
+                            f'imports=[\n\t{new_imports}\n]',
+                            module_body,
+                            flags=re.DOTALL
                         )
                     else:
-                        # If imports=[] doesn't exist, add imports directly
-                        modified_content = file_content.replace(
-                            match.group(0),
-                            text_to_add + f'\n@Module(\n\timports=[\n{new_import}\n],{existing_imports_str})'
-                        )
-
-                    cleaned_code = autoflake.fix_code(modified_content)
-                    sorted_code = isort.code(cleaned_code)
-                    fixed_code = autopep8.fix_code(sorted_code)
-                    with open(app_path, 'w') as file2:
-                        file2.write(fixed_code)
-                        file2.close()
-
+                        updated_module_body = module_body
                 else:
-                    print(f"No @Module decorator found in app_module.py.")
+                    # If 'imports' doesn't exist, add it to the @Module properties
+                    updated_module_body = module_body.strip() + f',\n\timports=[\n\t{module_name}\n]'
+
+                # Replace the old @Module body with the updated one
+                updated_content = file_content.replace(module_body, updated_module_body)
+
+                # Clean, sort, and format the final code
+                cleaned_code = autoflake.fix_code(updated_content)
+                sorted_code = isort.code(cleaned_code)
+                formatted_code = autopep8.fix_code(sorted_code)
+
+                # Write the updated content back to the file
+                with open(app_path, 'w') as file:
+                    file.write(formatted_code)
+            else:
+                print("No @Module decorator found in app_module.py.")
