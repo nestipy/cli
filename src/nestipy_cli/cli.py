@@ -160,7 +160,7 @@ def resource(name: str) -> None:
     """Create new resource for project.
     :rtype: object
     :param name:
-    :type name: 
+    :type name:
     """
     name = str(name).lower()
     choice = questionary.select('Select resource type:', choices=['api', 'graphql']).ask()
@@ -213,6 +213,22 @@ def graphql_input(name):
     name = str(name).lower()
     handler.generate_service(name, prefix='single')
     echo.success(f"Graphql Input created successfully inside src/{name}.")
+
+
+@main.command()
+@click.option('-D', '--cli_path', default='cli:command', help="Command path")
+@click.argument('name', required=True)
+@click.argument('args', nargs=-1, required=False)
+def run(cli_path: str, name: str, args: any):
+    """ Run nestipy commander app """
+    module_path, cmd_name = cli_path.split(":")
+    module_file_path = Path(module_path).resolve()
+    module_name = module_file_path.stem
+    sys.path.append(str(module_file_path.parent))
+    mod = importlib.import_module(module_name)
+    command = getattr(mod, cmd_name)
+    print(command, name, args)
+    asyncio.run(command.run(name, args))
 
 
 if __name__ == "__main__":

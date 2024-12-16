@@ -20,10 +20,10 @@ class {{name|capitalize}}Controller:
     async def create(self, data: Annotated[Create{{name|capitalize}}Dto, Body()]) -> str:
         return await self.{{name|lower}}_service.create(data)
 
-    @Put('/{{'{'}}{{name|lower}}{{'_id}'}}')
-    async def update(self, {{name|lower}}_id: Annotated[int, Param('{{name|lower}}_id')], data: Annotated[Update{{name|capitalize}}Dto, Body()]) -> str:
+    @Put('/{{'{id}'}}')
+    async def update(self, {{name|lower}}_id: Annotated[int, Param('id')], data: Annotated[Update{{name|capitalize}}Dto, Body()]) -> str:
         return await self.{{name|lower}}_service.update({{name|lower}}_id, data)
 
-    @Delete('/{{'{'}}{{name|lower}}{{'_id}'}}')
-    async def delete(self, {{name|lower}}_id: Annotated[int,Param('{{name|lower}}_id')] ) -> None:
+    @Delete('/{{'{id}'}}')
+    async def delete(self, {{name|lower}}_id: Annotated[int,Param('id')] ) -> None:
         return await self.{{name|lower}}_service.delete({{name|lower}}_id)
