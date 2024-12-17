@@ -11,8 +11,8 @@ class TemplateGenerator:
         self.env = Environment(
             loader=self.loader
         )
-        self.env.add_filter('capitalize', str.capitalize)
-        self.env.add_filter('lower', str.lower)
+        # self.env.add_filter('capitalize', str.capitalize)
+        # self.env.add_filter('lower', str.lower)
 
     @classmethod
     def loader(cls, name):

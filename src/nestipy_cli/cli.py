@@ -189,6 +189,15 @@ def controller(name):
     echo.success(f"Controller created successfully inside src/{name}.")
 
 
+@make.command(aliases=['cmd'])
+@click.argument('name')
+def command(name):
+    """ Create new controller """
+    name = str(name).lower()
+    handler.generate_command(name)
+    echo.success(f"Command created successfully inside src/{name}.")
+
+
 @make.command()
 @click.argument('name')
 def resolver(name):

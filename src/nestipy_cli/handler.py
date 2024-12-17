@@ -43,6 +43,10 @@ class NestipyCliHandler:
         self.generate_resolver(name)
         self.generate_module(name, prefix='graphql')
 
+    def generate_command(self, name: str, prefix: str = None):
+        path = self.mkdir(name)
+        self.generate(name, path, 'command', prefix=prefix)
+
     def generate_module(self, name: str, prefix: str = None):
         path = self.mkdir(name)
         self.generate(name, path, 'module', prefix=prefix)
@@ -72,7 +76,6 @@ class NestipyCliHandler:
         pref = f"{f'{prefix}_' if prefix is not None else ''}"
         content = self.generator.render_template(f"{pref}{template}.txt", name=name)
         file_path = str(os.path.join(parent_path, f"{name.lower()}_{template}.py"))
-        print(file_path)
         f = open(file_path, 'w+')
         f.write(content)
         f.close()

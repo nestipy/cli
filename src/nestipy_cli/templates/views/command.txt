@@ -1,0 +1,10 @@
+from nestipy.commander import BaseCommand, Command
+from nestipy.ioc import Inject
+
+
+@Command(name='{{name|lower}}', desc="{{name|capitalize}} command")
+class {{name|capitalize}}Command(BaseCommand):
+    async def run(self):
+        print(self.get_opt())
+        print(self.get_arg())
+        print("Hello from {{name}}")
