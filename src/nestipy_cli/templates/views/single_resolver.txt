@@ -9,9 +9,9 @@ from nestipy.graphql import Resolver, Query, Mutation
 class {{name|capitalize}}Resolver:
 
     @Query()
-    def {{name|lower}}_test_query(self) -> str:
+    def {{name|lower}}_query(self) -> str:
         return "test"
 
     @Mutation()
-    def {{name|lower}}_test_mutation(self,test: Annotated[str, Arg()]) -> str:
+    def {{name|lower}}_mutation(self,test: Annotated[str, Arg()]) -> str:
         return test

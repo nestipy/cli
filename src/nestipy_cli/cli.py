@@ -3,6 +3,7 @@ import importlib
 import os.path
 import random
 import sys
+import warnings
 from pathlib import Path
 from subprocess import DEVNULL, check_call
 
@@ -19,6 +20,7 @@ from yaspin import yaspin
 
 from .config import LOGGING_CONFIG, PROD_LOGGER
 from .handler import NestipyCliHandler
+from .repl import REPL
 from .style import CliStyle
 
 console = Console()
@@ -32,7 +34,7 @@ def main():
     click.clear()
 
 
-@main.command()
+@main.command(aliases=['n'])
 @click.argument('name')
 def new(name):
     """ Create new project """
@@ -42,6 +44,7 @@ def new(name):
     created = handler.create_project(name)
     if not created:
         echo.error(f"Folder {name} already exist.")
+        return
     echo.info(f"Project {name} created successfully.\nStart your project by running:\n\tcd {name}"
               f"\n\tpython -m pip install -r requirements.py\n\tnestipy start --dev")
     # else:
@@ -225,18 +228,33 @@ def graphql_input(name):
 
 
 @main.command()
-@click.option('-D', '--cli_path', default='cli:command', help="Command path")
+@click.option('-P', '--path', default='cli:command', help="Command path")
 @click.argument('name', required=True)
 @click.argument('args', nargs=-1, required=False, type=click.UNPROCESSED)
-def run(cli_path: str, name: str, args: any):
+def run(path: str, name: str, args: any):
     """ Run nestipy commander app """
-    module_path, cmd_name = cli_path.split(":")
+    module_path, cmd_name = path.split(":")
     module_file_path = Path(module_path).resolve()
     module_name = module_file_path.stem
     sys.path.append(str(module_file_path.parent))
     mod = importlib.import_module(module_name)
     command = getattr(mod, cmd_name)
     asyncio.run(command.run(name, tuple(args)))
+
+
+@main.command(name="repl")
+@click.option('-P', '--path', default='main:app', help="Nestipy Application path")
+def repl(path: str):
+    """ Run nestipy REPL """
+    module_path, app_name = path.split(":")
+    module_file_path = Path(module_path).resolve()
+    module_name = module_file_path.stem
+    sys.path.append(str(module_file_path.parent))
+    mod = importlib.import_module(module_name)
+    app = getattr(mod, app_name)
+    repl_ = REPL(app)
+    warnings.simplefilter("ignore", category=RuntimeWarning)
+    repl_.interact(banner="Nestipy REPL", exitmsg="Exiting REPL ...")
 
 
 if __name__ == "__main__":

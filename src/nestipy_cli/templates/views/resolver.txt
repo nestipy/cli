@@ -13,9 +13,9 @@ class {{name|capitalize}}Resolver:
     {{name|lower}}_service: Annotated[{{name|capitalize}}Service, Inject()]
 
     @Query()
-    async def {{name|lower}}_test_query(self) -> str:
+    async def {{name|lower}}_query(self) -> str:
         return await self.{{name|lower}}_service.list()
 
     @Mutation()
-    async def {{name|lower}}_test_mutation(self,data: Annotated[{{name|capitalize}}Input, Arg()]) -> str:
+    async def {{name|lower}}_mutation(self,data: Annotated[{{name|capitalize}}Input, Arg()]) -> str:
         return data.test
