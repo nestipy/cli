@@ -4,6 +4,8 @@ import inspect
 from types import CodeType
 from typing import Type, Optional
 
+from nestipy.dynamic_module import DynamicModule
+
 from .style import CliStyle
 
 echo = CliStyle()
@@ -41,17 +43,24 @@ class REPL(code.InteractiveConsole):
                 if not name.startswith('_'):
                     echo.info("  ◻ {}".format(name))
 
-    @classmethod
-    def debug(cls, module: Type) -> None:
+    def debug(self, module: Type = None, level: str = "  ") -> None:
+        if module is None:
+            module = getattr(self.app, "_root_module", None)
+            if module is None:
+                raise Exception("Module not defined")
         metadata: Optional[dict] = getattr(module, '__reflect__metadata__')
-        echo.info(f"{module.__name__}:")
+        echo.info(f"{level}{module.__name__}:")
         if metadata and metadata.get('_is_module_'):
             imports = metadata['imports']
             if imports:
                 echo.info("  - Imports:")
                 for imp in imports:
-                    echo.info("    ◻ {}".format(imp.__name__))
-                    cls.debug(imp)
+                    if isinstance(imp, DynamicModule):
+                        echo.info(f"  {level}  ◻ {imp.module.__name__}")
+                        # self.debug(imp.module, level=f"  {level}")
+                    elif inspect.isclass(imp):
+                        echo.info(f"  {level}  ◻ {imp.__name__}")
+                        # self.debug(imp, level=f"  {level}")
             controllers = metadata['controllers']
             if controllers:
                 echo.info("  - Controllers:")
