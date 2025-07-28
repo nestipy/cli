@@ -1,6 +1,6 @@
 [project]
 name = "nestipy-cli"
-version = "0.7.0"
+version = "0.7.1"
 description = "Nestipy is a Python framework built on top of FastAPI that follows the modular architecture of NestJS"
 authors = [{ name = "tsiresymila", email = "tsiresymila@gmail.com" }]
 requires-python = ">=3.11"
@@ -14,7 +14,7 @@ dependencies = [
     "isort>=5.13.2,<6",
     "autopep8>=2.1.0,<3",
     "minijinja>=2.2.0,<3",
-    "uvicorn[standard]>=0.31.1,<0.32",
+    "uvicorn[standard]>=0.35.0,<0.36.0",
     "yaspin>=3.1.0,<4",
     "rich-click>=1.8.3,<2",
     "watchdog>=4.0.1,<5",
