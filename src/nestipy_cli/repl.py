@@ -4,12 +4,11 @@ import inspect
 from types import CodeType
 from typing import Type, Optional
 
-from nestipy.dynamic_module import DynamicModule
-
 from .style import CliStyle
 
 echo = CliStyle()
 try:
+    from nestipy.dynamic_module import DynamicModule
     from nestipy.core import NestipyApplication, DiscoverService
 except ImportError:
     echo.error("Nestipy not installed ...")

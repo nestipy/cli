@@ -227,7 +227,9 @@ def graphql_input(name):
     echo.success(f"Graphql Input created successfully inside src/{name}.")
 
 
-@main.command()
+@main.command(
+    context_settings={"ignore_unknown_options": True},
+)
 @click.option('-P', '--path', default='cli:command', help="Command path")
 @click.argument('name', required=True)
 @click.argument('args', nargs=-1, required=False, type=click.UNPROCESSED)
@@ -238,8 +240,8 @@ def run(path: str, name: str, args: any):
     module_name = module_file_path.stem
     sys.path.append(str(module_file_path.parent))
     mod = importlib.import_module(module_name)
-    command = getattr(mod, cmd_name)
-    asyncio.run(command.run(name, tuple(args)))
+    cmd = getattr(mod, cmd_name)
+    asyncio.run(cmd.run(name, args))
 
 
 @main.command(name="repl")

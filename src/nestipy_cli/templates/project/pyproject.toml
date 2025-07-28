@@ -1,0 +1,7 @@
+[project]
+name = "nestipy_app"
+version = "0.0.1"
+dependencies = ["nestipy"]
+
+[tool.uv]
+package = false

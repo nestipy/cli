@@ -11,5 +11,5 @@ class AppCommand(BaseCommand):
     service: Annotated[AppService, Inject()]
 
     async def run(self):
-        print(self.get_opt())
+        print(self.get_arg(), self.get_opt())
         print("Hello ", await self.service.get())
