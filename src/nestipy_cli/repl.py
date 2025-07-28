@@ -2,21 +2,17 @@ import asyncio
 import code
 import inspect
 from types import CodeType
-from typing import Type, Optional
+from typing import Type, Optional, TYPE_CHECKING
 
 from .style import CliStyle
 
 echo = CliStyle()
-try:
-    from nestipy.dynamic_module import DynamicModule
-    from nestipy.core import NestipyApplication, DiscoverService
-except ImportError:
-    echo.error("Nestipy not installed ...")
-    exit()
+if TYPE_CHECKING:
+    from nestipy.core import NestipyApplication
 
 
 class REPL(code.InteractiveConsole):
-    def __init__(self, app: NestipyApplication):
+    def __init__(self, app: "NestipyApplication"):
         self.app = app
         self.context = {
             'app': self.app,
@@ -43,6 +39,7 @@ class REPL(code.InteractiveConsole):
                     echo.info("  ◻ {}".format(name))
 
     def debug(self, module: Type = None, level: str = "  ") -> None:
+        from nestipy.dynamic_module import DynamicModule
         if module is None:
             module = getattr(self.app, "_root_module", None)
             if module is None:
@@ -79,6 +76,7 @@ class REPL(code.InteractiveConsole):
                             echo.info("    ◻ {}".format(token))
 
     async def _load_context(self):
+        from nestipy.core import DiscoverService
         await self.app.ready()
         discover: DiscoverService = await self.app.get(DiscoverService)
         all_modules: list[object] = discover.get_all_module()
