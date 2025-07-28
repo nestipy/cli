@@ -1,6 +1,6 @@
 [project]
 name = "nestipy-cli"
-version = "0.7.1"
+version = "0.7.2"
 description = "Nestipy is a Python framework built on top of FastAPI that follows the modular architecture of NestJS"
 authors = [{ name = "tsiresymila", email = "tsiresymila@gmail.com" }]
 requires-python = ">=3.11"

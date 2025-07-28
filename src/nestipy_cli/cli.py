@@ -46,7 +46,7 @@ def new(name):
         echo.error(f"Folder {name} already exist.")
         return
     echo.info(f"Project {name} created successfully.\nStart your project by running:\n\tcd {name}"
-              f"\n\tpython -m pip install -r requirements.py\n\tnestipy start --dev")
+              f"\n\tuv sync \n\tnestipy start --dev")
     # else:
     #     echo.error(f"Nestipy need poetry as dependency manager.")
 
