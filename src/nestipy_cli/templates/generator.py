@@ -8,9 +8,7 @@ class TemplateGenerator:
     env: Environment
 
     def __init__(self):
-        self.env = Environment(
-            loader=self.loader
-        )
+        self.env = Environment(loader=self.loader)
         # self.env.add_filter('capitalize', str.capitalize)
         # self.env.add_filter('lower', str.lower)
 
@@ -22,7 +20,7 @@ class TemplateGenerator:
                 return None
             segments.append(segment)
         try:
-            path = os.path.join(os.path.dirname(__file__), 'views', *segments)
+            path = os.path.join(os.path.dirname(__file__), "views", *segments)
             print(path)
             with open(path) as f:
                 content = f.read()
@@ -35,4 +33,8 @@ class TemplateGenerator:
 
     @classmethod
     def copy_project(cls, destination):
-        shutil.copytree(os.path.join(os.path.dirname(__file__), 'project'), destination, dirs_exist_ok=True)
+        shutil.copytree(
+            os.path.join(os.path.dirname(__file__), "project"),
+            destination,
+            dirs_exist_ok=True,
+        )

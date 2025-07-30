@@ -2,7 +2,7 @@ from nestipy.commander import BaseCommand, Command
 from nestipy.ioc import Inject
 
 
-@Command(name='test', desc="TEST command")
+@Command(name="test", desc="TEST command")
 class TestCommand(BaseCommand):
     async def run(self):
         print(self.get_opt())

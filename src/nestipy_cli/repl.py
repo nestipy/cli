@@ -15,13 +15,13 @@ class REPL(code.InteractiveConsole):
     def __init__(self, app: "NestipyApplication"):
         self.app = app
         self.context = {
-            'app': self.app,
-            'debug': self.debug,
-            'methods': self.methods,
-            'get': self.get,
-            '__builtins__': __builtins__,
-            '__name__': __name__,
-            '__doc__': None
+            "app": self.app,
+            "debug": self.debug,
+            "methods": self.methods,
+            "get": self.get,
+            "__builtins__": __builtins__,
+            "__name__": __name__,
+            "__doc__": None,
         }
         self.loop = asyncio.get_event_loop()
         self.loop.run_until_complete(self._load_context())
@@ -33,21 +33,24 @@ class REPL(code.InteractiveConsole):
     @classmethod
     def methods(cls, c: Type):
         if inspect.isclass(c):
-            echo.info(f'{c.__name__}:')
-            for name, func in inspect.getmembers(c, predicate=lambda a: inspect.isfunction(a) or inspect.ismethod(a)):
-                if not name.startswith('_'):
+            echo.info(f"{c.__name__}:")
+            for name, func in inspect.getmembers(
+                c, predicate=lambda a: inspect.isfunction(a) or inspect.ismethod(a)
+            ):
+                if not name.startswith("_"):
                     echo.info("  ◻ {}".format(name))
 
     def debug(self, module: Type = None, level: str = "  ") -> None:
         from nestipy.dynamic_module import DynamicModule
+
         if module is None:
             module = getattr(self.app, "_root_module", None)
             if module is None:
                 raise Exception("Module not defined")
-        metadata: Optional[dict] = getattr(module, '__reflect__metadata__')
+        metadata: Optional[dict] = getattr(module, "__reflect__metadata__")
         echo.info(f"{level}{module.__name__}:")
-        if metadata and metadata.get('_is_module_'):
-            imports = metadata['imports']
+        if metadata and metadata.get("_is_module_"):
+            imports = metadata["imports"]
             if imports:
                 echo.info("  - Imports:")
                 for imp in imports:
@@ -57,12 +60,12 @@ class REPL(code.InteractiveConsole):
                     elif inspect.isclass(imp):
                         echo.info(f"  {level}  ◻ {imp.__name__}")
                         # self.debug(imp, level=f"  {level}")
-            controllers = metadata['controllers']
+            controllers = metadata["controllers"]
             if controllers:
                 echo.info("  - Controllers:")
                 for controller in controllers:
                     echo.info("    ◻ {}".format(controller.__name__))
-            providers = metadata['providers']
+            providers = metadata["providers"]
             if providers:
                 echo.info("  - Providers:")
                 for p in providers:
@@ -77,6 +80,7 @@ class REPL(code.InteractiveConsole):
 
     async def _load_context(self):
         from nestipy.core import DiscoverService
+
         await self.app.ready()
         discover: DiscoverService = await self.app.get(DiscoverService)
         all_modules: list[object] = discover.get_all_module()
@@ -95,7 +99,9 @@ class REPL(code.InteractiveConsole):
             wrapped_code = source.replace(await_key, "")
             if source.strip().startswith(await_key):
                 try:
-                    result = self.loop.run_until_complete(eval(wrapped_code, self.context))
+                    result = self.loop.run_until_complete(
+                        eval(wrapped_code, self.context)
+                    )
                     self.context["_"] = result
                     super().runsource("_", filename, symbol)
                 except Exception as e:

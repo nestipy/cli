@@ -33,7 +33,8 @@
     ├── app_controller.py
     ├── app_service.py
     ├── main.py
-    ├── requirements.txt
+    ├── pyproject.toml
+    ├── uv.lock
     ├── README.md
     
        

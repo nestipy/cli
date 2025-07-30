@@ -1,7 +1,7 @@
 import os
 from typing import Any
 
-log_dir = os.path.join(os.getcwd(), 'logs')
+log_dir = os.path.join(os.getcwd(), "logs")
 LOGGING_CONFIG: dict[str, Any] = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -33,23 +33,35 @@ LOGGING_CONFIG: dict[str, Any] = {
         "default": {
             "formatter": "default",
             "class": "logging.FileHandler",
-            "filename": os.path.join(log_dir, 'default.log'),
+            "filename": os.path.join(log_dir, "default.log"),
         },
         "access": {
             "formatter": "access",
             "class": "logging.FileHandler",
-            "filename": os.path.join(log_dir, 'access.log'),
+            "filename": os.path.join(log_dir, "access.log"),
         },
     },
     "loggers": {
         "uvicorn": {"handlers": ["console"], "level": "INFO", "propagate": False},
         "uvicorn.error": {"level": "INFO"},
-        "uvicorn.access": {"handlers": ["console-access"], "level": "INFO", "propagate": False},
+        "uvicorn.access": {
+            "handlers": ["console-access"],
+            "level": "INFO",
+            "propagate": False,
+        },
     },
 }
 
 PROD_LOGGER = {
-    "uvicorn": {"handlers": ["default", "console"], "level": "INFO", "propagate": False},
+    "uvicorn": {
+        "handlers": ["default", "console"],
+        "level": "INFO",
+        "propagate": False,
+    },
     "uvicorn.error": {"level": "INFO"},
-    "uvicorn.access": {"handlers": ["access", "console-access"], "level": "INFO", "propagate": False},
+    "uvicorn.access": {
+        "handlers": ["access", "console-access"],
+        "level": "INFO",
+        "propagate": False,
+    },
 }
