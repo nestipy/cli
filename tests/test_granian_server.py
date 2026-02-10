@@ -108,14 +108,14 @@ class TestGranianServer(unittest.TestCase):
 
     def test_rewrite_granian_line(self) -> None:
         self.assertEqual(
-            rewrite_granian_line("[INFO] Starting granian"),
+            rewrite_granian_line("[INFO] Starting granian", use_color=False),
             "[NESTIPY] INFO Starting granian",
         )
         self.assertEqual(
-            rewrite_granian_line("[NESTIPY] INFO Already formatted"),
+            rewrite_granian_line("[NESTIPY] INFO Already formatted", use_color=False),
             "[NESTIPY] INFO Already formatted",
         )
-        self.assertEqual(rewrite_granian_line("plain log"), "plain log")
+        self.assertEqual(rewrite_granian_line("plain log", use_color=False), "plain log")
 
 
 if __name__ == "__main__":

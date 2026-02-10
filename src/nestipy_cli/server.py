@@ -4,8 +4,10 @@ import copy
 import contextlib
 import inspect
 import logging.config
+import os
 import re
 import sys
+import threading
 import json
 import os
 import random
@@ -60,7 +62,22 @@ def configure_logging(config: dict[str, Any]) -> None:
     logging.config.dictConfig(config)
 
 
-def rewrite_granian_line(line: str) -> str:
+LEVEL_COLORS = {
+    "DEBUG": "36",
+    "INFO": "32",
+    "WARNING": "33",
+    "WARN": "33",
+    "ERROR": "31",
+    "CRITICAL": "1;31",
+}
+
+
+def _colorize_level(level: str) -> str:
+    color = LEVEL_COLORS.get(level, "37")
+    return f"\x1b[{color}m{level}\x1b[0m"
+
+
+def rewrite_granian_line(line: str, use_color: bool = True) -> str:
     if line.startswith("[NESTIPY]"):
         return line
     match = re.match(r"^\[(?P<level>[A-Z]+)\]\s*(?P<rest>.*)$", line)
@@ -68,56 +85,79 @@ def rewrite_granian_line(line: str) -> str:
         return line
     level = match.group("level")
     rest = match.group("rest")
+    colored_level = (
+        _colorize_level(level)
+        if use_color and "\x1b[" not in line
+        else level
+    )
     if rest:
-        return f"[NESTIPY] {level} {rest}"
-    return f"[NESTIPY] {level}"
+        return f"[NESTIPY] {colored_level} {rest}"
+    return f"[NESTIPY] {colored_level}"
 
 
-class _PrefixedStream:
-    def __init__(self, stream):
-        self._stream = stream
-        self._buffer = ""
+def _start_rewrite_thread(
+    read_fd: int, write_fd: int, use_color: bool
+) -> threading.Thread:
+    def _reader() -> None:
+        buffer = ""
+        while True:
+            try:
+                chunk = os.read(read_fd, 4096)
+            except OSError:
+                break
+            if not chunk:
+                break
+            buffer += chunk.decode("utf-8", errors="replace")
+            while "\n" in buffer:
+                line, buffer = buffer.split("\n", 1)
+                os.write(
+                    write_fd,
+                    (rewrite_granian_line(line, use_color=use_color) + "\n").encode(
+                        "utf-8"
+                    ),
+                )
+        if buffer:
+            os.write(
+                write_fd,
+                rewrite_granian_line(buffer, use_color=use_color).encode("utf-8"),
+            )
 
-    def write(self, data):
-        if isinstance(data, bytes):
-            data = data.decode(getattr(self._stream, "encoding", None) or "utf-8")
-        self._buffer += data
-        while "\n" in self._buffer:
-            line, self._buffer = self._buffer.split("\n", 1)
-            self._stream.write(rewrite_granian_line(line) + "\n")
-
-    def flush(self):
-        if self._buffer:
-            self._stream.write(rewrite_granian_line(self._buffer))
-            self._buffer = ""
-        self._stream.flush()
-
-    def isatty(self):
-        return self._stream.isatty()
-
-    def fileno(self):
-        return self._stream.fileno()
-
-    @property
-    def encoding(self):
-        return getattr(self._stream, "encoding", "utf-8")
-
-    @property
-    def errors(self):
-        return getattr(self._stream, "errors", "strict")
+    thread = threading.Thread(target=_reader, daemon=True)
+    thread.start()
+    return thread
 
 
 @contextlib.contextmanager
 def granian_log_prefixer():
-    original_stdout = sys.stdout
-    original_stderr = sys.stderr
-    sys.stdout = _PrefixedStream(original_stdout)
-    sys.stderr = _PrefixedStream(original_stderr)
+    stdout_fd = sys.stdout.fileno()
+    stderr_fd = sys.stderr.fileno()
+    use_color = (
+        os.isatty(stdout_fd) and os.getenv("NO_COLOR") is None
+    )
+    orig_stdout_fd = os.dup(stdout_fd)
+    orig_stderr_fd = os.dup(stderr_fd)
+    stdout_r, stdout_w = os.pipe()
+    stderr_r, stderr_w = os.pipe()
+
+    os.dup2(stdout_w, stdout_fd)
+    os.dup2(stderr_w, stderr_fd)
+    os.close(stdout_w)
+    os.close(stderr_w)
+
+    stdout_thread = _start_rewrite_thread(stdout_r, orig_stdout_fd, use_color)
+    stderr_thread = _start_rewrite_thread(stderr_r, orig_stderr_fd, use_color)
+
     try:
         yield
     finally:
-        sys.stdout = original_stdout
-        sys.stderr = original_stderr
+        os.dup2(orig_stdout_fd, stdout_fd)
+        os.dup2(orig_stderr_fd, stderr_fd)
+        os.close(orig_stdout_fd)
+        os.close(orig_stderr_fd)
+        os.close(stdout_r)
+        os.close(stderr_r)
+        stdout_thread.join(timeout=0.2)
+        stderr_thread.join(timeout=0.2)
 
 
 def write_logging_config(config: dict[str, Any]) -> Path:
