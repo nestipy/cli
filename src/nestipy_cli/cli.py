@@ -1,7 +1,5 @@
 import asyncio
 import importlib
-import os.path
-import random
 import sys
 import warnings
 from pathlib import Path
@@ -10,7 +8,6 @@ from typing import Literal
 
 import questionary
 import rich_click as click
-import uvicorn
 from click_aliases import ClickAliasedGroup
 from rich.box import ROUNDED
 from rich.console import Console
@@ -19,9 +16,18 @@ from rich.style import Style
 from rich.text import Text
 from yaspin import yaspin
 
-from .config import LOGGING_CONFIG, PROD_LOGGER
 from .handler import NestipyCliHandler
 from .repl import REPL
+from .server import (
+    GranianStartConfig,
+    build_logging_config,
+    configure_logging,
+    create_granian_instance,
+    ensure_log_dir,
+    granian_log_prefixer,
+    select_port,
+    write_logging_config,
+)
 from .style import CliStyle
 
 console = Console()
@@ -72,7 +78,7 @@ current_task = None
 @click.option("--ssl-keyfile", type=str, help="SSL certificate key.")
 @click.option("--ssl-cert-file", type=str, help="SSL certificate file.")
 @click.option("--loop", type=str, help="Event loop.", default="auto")
-@click.option("--http", type=str, help="Http", default="auto")
+@click.option("--http", type=str, help="HTTP protocol version.", default="auto")
 def start(
     app_path: str,
     dev: bool,
@@ -81,8 +87,8 @@ def start(
     workers: int,
     ssl_keyfile: str,
     ssl_cert_file,
-    loop: Literal["none", "auto", "asyncio", "uvloop"],
-    http: Literal["auto", "h11", "httptools"],
+    loop: Literal["auto", "asyncio", "rloop", "uvloop"],
+    http: Literal["auto", "1", "2"],
 ) -> None:
     """Starting nestipy server"""
     try:
@@ -101,6 +107,21 @@ def start(
             spinner.color = "green"
             spinner.ok("✔")
         importlib.import_module("nestipy")
+    try:
+        import granian  # noqa: F401
+    except ImportError:
+        with yaspin(text="Installing granian ...", color="blue") as spinner:
+            spinner.color = "blue"
+            check_call(
+                [sys.executable, "-m", "pip", "install", "pip", "--upgrade"],
+                stdout=DEVNULL,
+            )
+            check_call(
+                [sys.executable, "-m", "pip", "install", "granian[reload]", "--upgrade"],
+                stdout=DEVNULL,
+            )
+            spinner.color = "green"
+            spinner.ok("✔")
 
     module_path, app_name = app_path.split(":")
     module_file_path = Path(module_path).resolve()
@@ -118,14 +139,10 @@ def start(
     is_ms: bool = isinstance(app, NestipyMicroservice) and not isinstance(
         app, NestipyApplication
     )
-    config = LOGGING_CONFIG
+    config = build_logging_config(dev)
+    configure_logging(config)
     if not dev:
-        config["loggers"] = PROD_LOGGER
-        log_dir = os.path.join(os.getcwd(), "logs")
-        if not os.path.exists(log_dir):
-            os.mkdir(log_dir)
-            open(os.path.join(log_dir, "default.log"), "a").close()
-            open(os.path.join(log_dir, "access.log"), "a").close()
+        ensure_log_dir()
     environment = "Development" if dev else "Production"
     scheme = "https" if ssl_cert_file else "http"
     multiline_text = Text(style=Style(color="green"))
@@ -159,22 +176,25 @@ def start(
     if is_ms and not dev:
         asyncio.run(app.start())
 
-    uvicorn.run(
-        app_path,
-        reload=dev,
-        host=host,
-        port=port if not is_ms else random.randint(5000, 7000),
-        workers=workers,
-        log_config=config,
-        lifespan="on" if is_ms else "auto",
-        log_level="critical" if is_ms else None,
-        access_log=False if is_ms else None,
-        ssl_keyfile=ssl_keyfile,
-        ssl_certfile=ssl_cert_file,
-        use_colors=True,
-        loop=loop,
-        http=http,
+    log_config_path = write_logging_config(config)
+    selected_port = select_port(port, is_ms)
+    server = create_granian_instance(
+        GranianStartConfig(
+            app_path=app_path,
+            dev=dev,
+            host=host,
+            port=selected_port,
+            workers=workers,
+            ssl_keyfile=ssl_keyfile,
+            ssl_cert_file=ssl_cert_file,
+            loop=loop,
+            http=http,
+            is_microservice=is_ms,
+            log_config_path=log_config_path,
+        )
     )
+    with granian_log_prefixer():
+        server.serve()
 
 
 @make.command(name="resource", aliases=["r", "res"])

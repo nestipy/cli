@@ -1,4 +1,3 @@
-import uvicorn
 from nestipy.core import NestipyFactory
 from nestipy.microservice import MicroserviceOption, Transport
 
@@ -14,14 +13,14 @@ app = NestipyFactory.create_microservice(
 )
 # app.start_all_microservices()
 if __name__ == "__main__":
-    uvicorn.run(
+    app.listen(
         "main:app",
+        interface="asgi",
         host="0.0.0.0",
         port=8000,
         reload=True,
-        lifespan="on",
         log_level="critical",
         access_log=False,
-    )
+    ).serve()
     # print("Starting microservice server ")
     # asyncio.run(app.start())

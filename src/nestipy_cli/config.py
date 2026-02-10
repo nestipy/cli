@@ -1,22 +1,18 @@
 import os
 from typing import Any
-
+DEFAULT_LOG_FORMAT = "[NESTIPY] %(levelname)s %(message)s"
+ACCESS_LOG_FORMAT = "[NESTIPY] %(levelname)s [%(asctime)s] %(message)s"
 log_dir = os.path.join(os.getcwd(), "logs")
 LOGGING_CONFIG: dict[str, Any] = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
         "default": {
-            "()": "uvicorn.logging.DefaultFormatter",
-            "fmt": "%(levelprefix)s   %(asctime)s   [MSG]   %(message)s",
-            "datefmt": "%Y/%m/%d, %H:%M:%S",
-            "use_colors": True,
+            "format": DEFAULT_LOG_FORMAT,
         },
         "access": {
-            "()": "uvicorn.logging.AccessFormatter",
-            "fmt": '%(levelprefix)s   %(asctime)s   [HTTP]  %(client_addr)s - "%(request_line)s" %(status_code)s',
-            "datefmt": "%Y/%m/%d, %H:%M:%S",
-            "use_colors": True,
+            "format": ACCESS_LOG_FORMAT,
+            "datefmt": "%Y-%m-%d %H:%M:%S %z",
         },
     },
     "handlers": {
@@ -42,9 +38,9 @@ LOGGING_CONFIG: dict[str, Any] = {
         },
     },
     "loggers": {
-        "uvicorn": {"handlers": ["console"], "level": "INFO", "propagate": False},
-        "uvicorn.error": {"level": "INFO"},
-        "uvicorn.access": {
+        "_granian": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        "granian": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        "granian.access": {
             "handlers": ["console-access"],
             "level": "INFO",
             "propagate": False,
@@ -53,13 +49,17 @@ LOGGING_CONFIG: dict[str, Any] = {
 }
 
 PROD_LOGGER = {
-    "uvicorn": {
+    "_granian": {
         "handlers": ["default", "console"],
         "level": "INFO",
         "propagate": False,
     },
-    "uvicorn.error": {"level": "INFO"},
-    "uvicorn.access": {
+    "granian": {
+        "handlers": ["default", "console"],
+        "level": "INFO",
+        "propagate": False,
+    },
+    "granian.access": {
         "handlers": ["access", "console-access"],
         "level": "INFO",
         "propagate": False,
