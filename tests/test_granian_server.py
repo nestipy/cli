@@ -31,13 +31,23 @@ class TestGranianServer(unittest.TestCase):
             http="auto",
             is_microservice=False,
             log_config_path=Path("/tmp/granian.json"),
+            reload_any=False,
+            reload_paths=[],
+            reload_ignore_dirs=[],
+            reload_ignore_patterns=[],
+            reload_ignore_paths=[],
+            reload_tick=None,
+            reload_ignore_worker_failure=False,
         )
         options = build_granian_options(cfg)
         self.assertTrue(options["reload"])
         self.assertTrue(options["access_log"])
         self.assertFalse(options["no_access_log"])
+        self.assertTrue(options["log_access_enabled"])
+        self.assertTrue(options["log_access"])
         self.assertEqual(options["host"], "0.0.0.0")
         self.assertEqual(options["port"], 8000)
+        self.assertTrue(options["reload_ignore_patterns"])
 
     def test_build_granian_options_microservice(self) -> None:
         cfg = GranianStartConfig(
@@ -52,9 +62,18 @@ class TestGranianServer(unittest.TestCase):
             http="1",
             is_microservice=True,
             log_config_path=Path("/tmp/granian.json"),
+            reload_any=False,
+            reload_paths=[],
+            reload_ignore_dirs=[],
+            reload_ignore_patterns=[],
+            reload_ignore_paths=[],
+            reload_tick=None,
+            reload_ignore_worker_failure=False,
         )
         options = build_granian_options(cfg)
         self.assertTrue(options["no_access_log"])
+        self.assertFalse(options["log_access_enabled"])
+        self.assertFalse(options["log_access"])
         self.assertEqual(options["log_level"], "critical")
         self.assertEqual(options["ssl_keyfile"], "key.pem")
         self.assertEqual(options["ssl_certificate"], "cert.pem")
@@ -72,6 +91,13 @@ class TestGranianServer(unittest.TestCase):
             http="1",
             is_microservice=False,
             log_config_path=Path("/tmp/granian.json"),
+            reload_any=False,
+            reload_paths=[],
+            reload_ignore_dirs=[],
+            reload_ignore_patterns=[],
+            reload_ignore_paths=[],
+            reload_tick=None,
+            reload_ignore_worker_failure=False,
         )
 
         class DummyGranian:
@@ -116,6 +142,13 @@ class TestGranianServer(unittest.TestCase):
             "[NESTIPY] INFO Already formatted",
         )
         self.assertEqual(rewrite_granian_line("plain log", use_color=False), "plain log")
+        self.assertEqual(
+            rewrite_granian_line(
+                '[2026-02-11 18:20:19 +0300] 127.0.0.1 - "GET /x HTTP/1.1" 200 13.409',
+                use_color=False,
+            ),
+            '[NESTIPY] INFO [2026-02-11 18:20:19 +0300] 127.0.0.1 - "GET /x HTTP/1.1" 200 - 13.409 ms',
+        )
 
 
 if __name__ == "__main__":

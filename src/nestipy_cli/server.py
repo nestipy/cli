@@ -35,6 +35,13 @@ class GranianStartConfig:
     http: HttpChoice
     is_microservice: bool
     log_config_path: Path
+    reload_any: bool
+    reload_paths: list[str]
+    reload_ignore_dirs: list[str]
+    reload_ignore_patterns: list[str]
+    reload_ignore_paths: list[str]
+    reload_tick: int | None
+    reload_ignore_worker_failure: bool
 
 
 def select_port(port: int, is_microservice: bool) -> int:
@@ -62,37 +69,97 @@ def configure_logging(config: dict[str, Any]) -> None:
     logging.config.dictConfig(config)
 
 
-LEVEL_COLORS = {
-    "DEBUG": "36",
-    "INFO": "32",
-    "WARNING": "33",
-    "WARN": "33",
-    "ERROR": "31",
-    "CRITICAL": "1;31",
+STATUS_COLORS = {
+    "2xx": "32",
+    "3xx": "36",
+    "4xx": "33",
+    "5xx": "31",
 }
 
 
-def _colorize_level(level: str) -> str:
-    color = LEVEL_COLORS.get(level, "37")
-    return f"\x1b[{color}m{level}\x1b[0m"
+def _style_status(status: int) -> str:
+    if 200 <= status < 300:
+        return STATUS_COLORS["2xx"]
+    if 300 <= status < 400:
+        return STATUS_COLORS["3xx"]
+    if 400 <= status < 500:
+        return STATUS_COLORS["4xx"]
+    if 500 <= status < 600:
+        return STATUS_COLORS["5xx"]
+    return "37"
+
+
+def _extract_status_from_message(message: str) -> int | None:
+    try:
+        primary = re.search(r"\"[^\"]*\"\s+(\d{3})\b", message)
+        if primary:
+            value = int(primary.group(1))
+            if 100 <= value <= 599:
+                return value
+        candidates = [
+            int(match.group(1))
+            for match in re.finditer(r"(?<!\d)(\d{3})(?!\d)", message)
+            if 100 <= int(match.group(1)) <= 599
+        ]
+        if candidates:
+            return candidates[-1]
+    except Exception:
+        return None
+    return None
+
+
+def _colorize_status_ansi(message: str) -> str:
+    status = _extract_status_from_message(message)
+    if status is None:
+        return message
+    color = _style_status(status)
+    pattern = re.compile(rf"(?<!\d){status}(?!\d)")
+    return pattern.sub(f"\x1b[{color}m{status}\x1b[32m", message, count=1)
+
+
+def _rewrite_access_line(line: str) -> str | None:
+    match = re.match(r"^\[(?P<ts>[^\]]+)\]\s+(?P<rest>.+)$", line)
+    if not match:
+        return None
+    ts = match.group("ts")
+    rest = match.group("rest")
+    access = re.match(
+        r'^(?P<client>.+?)\s+-\s+"(?P<req>[^"]+)"\s+(?P<status>\d{3})\s+(?P<duration>[0-9.]+)(?:\s*ms)?\s*$',
+        rest,
+    )
+    if not access:
+        return None
+    client = access.group("client")
+    req = access.group("req")
+    status = access.group("status")
+    duration = access.group("duration")
+    return (
+        f'[NESTIPY] INFO [{ts}] {client} - "{req}" {status} - {duration} ms'
+    )
 
 
 def rewrite_granian_line(line: str, use_color: bool = True) -> str:
     if line.startswith("[NESTIPY]"):
-        return line
+        if not use_color or "\x1b[" in line:
+            return line
+        colored = _colorize_status_ansi(line)
+        return f"\x1b[32m{colored}\x1b[0m"
+    access_line = _rewrite_access_line(line)
+    if access_line:
+        if not use_color:
+            return access_line
+        colored = _colorize_status_ansi(access_line)
+        return f"\x1b[32m{colored}\x1b[0m"
     match = re.match(r"^\[(?P<level>[A-Z]+)\]\s*(?P<rest>.*)$", line)
     if not match:
         return line
     level = match.group("level")
     rest = match.group("rest")
-    colored_level = (
-        _colorize_level(level)
-        if use_color and "\x1b[" not in line
-        else level
-    )
-    if rest:
-        return f"[NESTIPY] {colored_level} {rest}"
-    return f"[NESTIPY] {colored_level}"
+    formatted = f"[NESTIPY] {level} {rest}".rstrip()
+    if not use_color or "\x1b[" in line:
+        return formatted
+    colored = _colorize_status_ansi(formatted)
+    return f"\x1b[32m{colored}\x1b[0m"
 
 
 def _start_rewrite_thread(
@@ -166,7 +233,20 @@ def write_logging_config(config: dict[str, Any]) -> Path:
         return Path(handle.name)
 
 
+PY_RELOAD_IGNORE_PATTERNS = [
+    r".*\.(?!(py|pyi|pyx|pyd)$)[^.]+$",
+]
+
+
 def build_granian_options(cfg: GranianStartConfig) -> dict[str, Any]:
+    reload_ignore_patterns = list(cfg.reload_ignore_patterns)
+    if cfg.dev and not cfg.reload_any:
+        reload_ignore_patterns = PY_RELOAD_IGNORE_PATTERNS + reload_ignore_patterns
+    reload_ignore_patterns = reload_ignore_patterns or None
+    reload_paths = cfg.reload_paths or None
+    reload_ignore_dirs = cfg.reload_ignore_dirs or None
+    reload_ignore_paths = cfg.reload_ignore_paths or None
+    access_enabled = not cfg.is_microservice
     options: dict[str, Any] = {
         "interface": "asgi",
         "host": cfg.host,
@@ -175,9 +255,17 @@ def build_granian_options(cfg: GranianStartConfig) -> dict[str, Any]:
         "loop": cfg.loop,
         "http": cfg.http,
         "log_config": str(cfg.log_config_path),
+        "reload_paths": reload_paths,
+        "reload_ignore_dirs": reload_ignore_dirs,
+        "reload_ignore_patterns": reload_ignore_patterns,
+        "reload_ignore_paths": reload_ignore_paths,
+        "reload_tick": cfg.reload_tick,
+        "reload_ignore_worker_failure": cfg.reload_ignore_worker_failure,
+        "log_access_enabled": access_enabled,
+        "log_access": access_enabled,
         "log_level": "critical" if cfg.is_microservice else None,
-        "access_log": not cfg.is_microservice,
-        "no_access_log": cfg.is_microservice,
+        "access_log": access_enabled,
+        "no_access_log": not access_enabled,
         "ssl_keyfile": cfg.ssl_keyfile,
         "ssl_certfile": cfg.ssl_cert_file,
         "ssl_certificate": cfg.ssl_cert_file,

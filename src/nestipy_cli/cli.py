@@ -79,6 +79,48 @@ current_task = None
 @click.option("--ssl-cert-file", type=str, help="SSL certificate file.")
 @click.option("--loop", type=str, help="Event loop.", default="auto")
 @click.option("--http", type=str, help="HTTP protocol version.", default="auto")
+@click.option(
+    "--reload-any",
+    is_flag=True,
+    default=False,
+    help="Reload on any file change (disable python-only filter).",
+)
+@click.option(
+    "--reload-path",
+    "reload_paths",
+    multiple=True,
+    help="Additional paths to watch for reload (can be set multiple times).",
+)
+@click.option(
+    "--reload-ignore-dir",
+    "reload_ignore_dirs",
+    multiple=True,
+    help="Directory names to ignore for reload (can be set multiple times).",
+)
+@click.option(
+    "--reload-ignore-pattern",
+    "reload_ignore_patterns",
+    multiple=True,
+    help="Regex patterns to ignore for reload (can be set multiple times).",
+)
+@click.option(
+    "--reload-ignore-path",
+    "reload_ignore_paths",
+    multiple=True,
+    help="Absolute paths to ignore for reload (can be set multiple times).",
+)
+@click.option(
+    "--reload-tick",
+    type=int,
+    default=None,
+    help="Polling interval in ms for reload (if supported by Granian).",
+)
+@click.option(
+    "--reload-ignore-worker-failure",
+    is_flag=True,
+    default=False,
+    help="Ignore worker failure during reload (if supported by Granian).",
+)
 def start(
     app_path: str,
     dev: bool,
@@ -89,6 +131,13 @@ def start(
     ssl_cert_file,
     loop: Literal["auto", "asyncio", "rloop", "uvloop"],
     http: Literal["auto", "1", "2"],
+    reload_any: bool,
+    reload_paths: tuple[str, ...],
+    reload_ignore_dirs: tuple[str, ...],
+    reload_ignore_patterns: tuple[str, ...],
+    reload_ignore_paths: tuple[str, ...],
+    reload_tick: int | None,
+    reload_ignore_worker_failure: bool,
 ) -> None:
     """Starting nestipy server"""
     try:
@@ -191,6 +240,13 @@ def start(
             http=http,
             is_microservice=is_ms,
             log_config_path=log_config_path,
+            reload_any=reload_any,
+            reload_paths=list(reload_paths),
+            reload_ignore_dirs=list(reload_ignore_dirs),
+            reload_ignore_patterns=list(reload_ignore_patterns),
+            reload_ignore_paths=list(reload_ignore_paths),
+            reload_tick=reload_tick,
+            reload_ignore_worker_failure=reload_ignore_worker_failure,
         )
     )
     with granian_log_prefixer():
