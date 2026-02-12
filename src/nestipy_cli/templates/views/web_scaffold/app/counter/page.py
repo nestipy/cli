@@ -37,31 +37,72 @@ def Page():
         {"label": "Counter", "to": "/counter"},
         {"label": "API", "to": "/api"},
     ]:
-        links.append(Link(item["label"], to=item["to"]))
+        links.append(
+            Link(
+                item["label"],
+                to=item["to"],
+                class_name=(
+                    "rounded-full px-4 py-2 text-xs font-medium text-slate-300 "
+                    "hover:bg-slate-800 hover:text-white"
+                ),
+            )
+        )
 
     if count % 2 == 0:
-        parity = h.span("Even", class_name="text-xs opacity-80")
+        parity = h.span("Even", class_name="text-xs text-emerald-400")
     else:
-        parity = h.span("Odd", class_name="text-xs opacity-80")
+        parity = h.span("Odd", class_name="text-xs text-amber-400")
 
     return h.div(
-        h.nav(links, class_name="flex gap-4 text-sm"),
-        h.h2("Counter", class_name="text-lg font-semibold"),
-        h.p(title, class_name="text-sm"),
-        parity,
-        h.div(
-            h.button(
-                "+1",
-                on_click=inc,
-                class_name="px-3 py-1 rounded bg-blue-600 text-white",
+        h.nav(
+            links,
+            class_name=(
+                "inline-flex items-center gap-2 rounded-full border border-slate-800 "
+                "bg-slate-900/60 p-1"
             ),
-            h.button(
-                "-1",
-                on_click=dec,
-                class_name="px-3 py-1 rounded bg-slate-700 text-white",
-            ),
-            class_name="flex gap-3",
         ),
-        h.p(f"Theme: {theme['theme']}", class_name="text-xs opacity-70"),
-        class_name="space-y-4",
+        h.section(
+            h.div(
+                h.h2("Counter", class_name="text-2xl font-semibold text-slate-100"),
+                h.p(
+                    "Use hooks to keep state and memoize values.",
+                    class_name="text-sm text-slate-400",
+                ),
+                class_name="space-y-2",
+            ),
+            h.div(
+                h.p(title, class_name="text-base text-slate-200"),
+                parity,
+                h.div(
+                    h.button(
+                        "+1",
+                        on_click=inc,
+                        class_name=(
+                            "rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white "
+                            "hover:bg-blue-500"
+                        ),
+                    ),
+                    h.button(
+                        "-1",
+                        on_click=dec,
+                        class_name=(
+                            "rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white "
+                            "hover:bg-slate-600"
+                        ),
+                    ),
+                    class_name="mt-4 flex gap-3",
+                ),
+                class_name="rounded-2xl border border-slate-800 bg-slate-900/60 p-6",
+            ),
+            class_name="space-y-6",
+        ),
+        h.div(
+            h.span("Theme", class_name="text-xs uppercase text-slate-500"),
+            h.p(
+                f"{theme['theme'].title()} mode active",
+                class_name="text-sm text-slate-300",
+            ),
+            class_name="rounded-2xl border border-slate-800 bg-slate-900/50 p-4",
+        ),
+        class_name="space-y-8",
     )
