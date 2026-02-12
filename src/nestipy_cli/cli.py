@@ -2,6 +2,10 @@ import asyncio
 import importlib
 import sys
 import warnings
+import atexit
+import os
+import shlex
+import subprocess
 from pathlib import Path
 from subprocess import DEVNULL, check_call
 from typing import Literal
@@ -43,19 +47,31 @@ def main():
 
 @main.command(aliases=["n"])
 @click.argument("name")
-def new(name):
+@click.option(
+    "--frontend",
+    is_flag=True,
+    default=False,
+    help="Include Nestipy Web scaffold with hooks + actions example.",
+)
+def new(name, frontend: bool):
     """Create new project"""
     # if not shutil.which('poetry'):
     # curl -sSL https://install.python-poetry.org | python3 -
     click.clear()
-    created = handler.create_project(name)
+    created = handler.create_project(name, frontend=frontend)
     if not created:
         echo.error(f"Folder {name} already exist.")
         return
-    echo.info(
+    message = (
         f"Project {name} created successfully.\nStart your project by running:\n\tcd {name}"
         f"\n\tuv sync \n\tnestipy start --dev"
     )
+    if frontend:
+        message += (
+            "\n\nFrontend dev (Vite + backend):"
+            "\n\tnestipy start --dev --web --web-args \"--vite --install\""
+        )
+    echo.info(message)
     # else:
     #     echo.error(f"Nestipy need poetry as dependency manager.")
 
@@ -121,6 +137,22 @@ current_task = None
     default=False,
     help="Ignore worker failure during reload (if supported by Granian).",
 )
+@click.option(
+    "--web",
+    is_flag=True,
+    default=False,
+    help="Start Nestipy Web dev server alongside the backend.",
+)
+@click.option(
+    "--web-args",
+    default="",
+    help="Extra arguments passed to `nestipy run web:dev`.",
+)
+@click.option(
+    "--web-proxy",
+    default=None,
+    help="Proxy URL for web dev server (defaults to backend address).",
+)
 def start(
     app_path: str,
     dev: bool,
@@ -138,6 +170,9 @@ def start(
     reload_ignore_paths: tuple[str, ...],
     reload_tick: int | None,
     reload_ignore_worker_failure: bool,
+    web: bool,
+    web_args: str,
+    web_proxy: str | None,
 ) -> None:
     """Starting nestipy server"""
     try:
@@ -227,6 +262,40 @@ def start(
 
     log_config_path = write_logging_config(config)
     selected_port = select_port(port, is_ms)
+    web_process = None
+    if web:
+        def _has_flag(args: list[str], flag: str) -> bool:
+            return any(arg == flag or arg.startswith(flag + "=") for arg in args)
+
+        def _strip_backend_flags(args: list[str]) -> list[str]:
+            cleaned: list[str] = []
+            skip_next = False
+            for arg in args:
+                if skip_next:
+                    skip_next = False
+                    continue
+                if arg in {"--backend", "--backend-cwd"}:
+                    skip_next = True
+                    continue
+                if arg.startswith("--backend=") or arg.startswith("--backend-cwd="):
+                    continue
+                cleaned.append(arg)
+            return cleaned
+
+        web_args_list = shlex.split(web_args) if web_args else ["--vite"]
+        web_args_list = _strip_backend_flags(web_args_list)
+        if not _has_flag(web_args_list, "--proxy") and not os.getenv("NESTIPY_WEB_PROXY"):
+            proxy_value = web_proxy or f"{scheme}://{host}:{selected_port}"
+            web_args_list.extend(["--proxy", proxy_value])
+        env = os.environ.copy()
+        env["NESTIPY_WEB_BACKEND"] = ""
+        env["NESTIPY_WEB_BACKEND_CWD"] = ""
+        web_process = subprocess.Popen(
+            ["nestipy", "run", "web:dev", *web_args_list],
+            cwd=str(module_file_path.parent),
+            env=env,
+        )
+        atexit.register(lambda: web_process and web_process.terminate())
     server = create_granian_instance(
         GranianStartConfig(
             app_path=app_path,
