@@ -17,10 +17,7 @@
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "@vitejs/plugin-react": "latest",
-    "autoprefixer": "latest",
-    "postcss": "latest",
     "tailwindcss": "latest",
-    "@tailwindcss/postcss": "latest",
     "typescript": "latest",
     "vite": "latest"
   }

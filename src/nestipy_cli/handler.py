@@ -125,15 +125,6 @@ class NestipyCliHandler:
             os.path.join(web_dir, "src", "main.tsx"),
             "web_scaffold/web/src/main.tsx",
         )
-        self._write_template(
-            os.path.join(web_dir, "tailwind.config.cjs"),
-            "web_scaffold/web/tailwind.config.cjs",
-        )
-        self._write_template(
-            os.path.join(web_dir, "postcss.config.cjs"),
-            "web_scaffold/web/postcss.config.cjs",
-        )
-
         self._append_readme(
             destination,
             self.generator.render_template("web_scaffold/README.md"),
