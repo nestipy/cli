@@ -99,7 +99,7 @@ def Page():
         h.div(
             h.span("Theme", class_name="text-xs uppercase text-slate-500"),
             h.p(
-                f"{theme['theme'].title()} mode active",
+                f"{theme['theme']} mode active",
                 class_name="text-sm text-slate-300",
             ),
             class_name="rounded-2xl border border-slate-800 bg-slate-900/50 p-4",
