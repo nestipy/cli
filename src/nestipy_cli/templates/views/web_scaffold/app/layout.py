@@ -19,6 +19,5 @@ def Layout():
             class_name="space-y-1",
         ),
         h(Slot),
-        value={"theme": theme, "toggle": toggle_handler},
-        class_name="min-h-screen bg-slate-950 text-white p-8 space-y-6",
+        value={"theme": theme, "toggle": toggle_handler}
     )

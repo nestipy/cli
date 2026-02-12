@@ -30,15 +30,25 @@ def Page():
         return f"Count: {count}"
 
     title = use_memo(label, deps=[count])
+
+    links = []
+    for item in [
+        {"label": "Home", "to": "/"},
+        {"label": "Counter", "to": "/counter"},
+        {"label": "API", "to": "/api"},
+    ]:
+        links.append(Link(item["label"], to=item["to"]))
+
+    if count % 2 == 0:
+        parity = h.span("Even", class_name="text-xs opacity-80")
+    else:
+        parity = h.span("Odd", class_name="text-xs opacity-80")
+
     return h.div(
-        h.nav(
-            Link("Home", to="/"),
-            Link("Counter", to="/counter"),
-            Link("API", to="/api"),
-            class_name="flex gap-4 text-sm",
-        ),
+        h.nav(links, class_name="flex gap-4 text-sm"),
         h.h2("Counter", class_name="text-lg font-semibold"),
         h.p(title, class_name="text-sm"),
+        parity,
         h.div(
             h.button(
                 "+1",

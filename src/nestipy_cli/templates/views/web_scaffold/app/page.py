@@ -12,7 +12,7 @@ from nestipy.web import (
 from layout import ThemeContext
 
 Link = external("react-router-dom", "Link")
-create_actions = external("../actions.client", "createActions", alias="create_actions")
+create_actions = external("../actions.client", "createActions", alias="createActions")
 ApiClient = external("../api/client", "ApiClient")
 
 
@@ -46,16 +46,25 @@ def Page():
     action_label = use_memo(label, deps=[message])
     use_effect(load_action, deps=[])
     use_effect(load_ping, deps=[])
+
+    links = []
+    for item in [
+        {"label": "Home", "to": "/"},
+        {"label": "Counter", "to": "/counter"},
+        {"label": "API", "to": "/api"},
+    ]:
+        links.append(Link(item["label"], to=item["to"]))
+
+    if ping == "Loading...":
+        ping_status = h.span("Loading...", class_name="opacity-80")
+    else:
+        ping_status = h.span(f"API ping: {ping}", class_name="opacity-80")
+
     return h.div(
-        h.nav(
-            Link("Home", to="/"),
-            Link("Counter", to="/counter"),
-            Link("API", to="/api"),
-            class_name="flex gap-4 text-sm",
-        ),
+        h.nav(links, class_name="flex gap-4 text-sm"),
         h.h2("Overview", class_name="text-lg font-semibold"),
         h.p(action_label, class_name="text-sm"),
-        h.p(f"API ping: {ping}", class_name="text-xs opacity-80"),
+        ping_status,
         h.div(
             h.button(
                 "Reload Action",

@@ -29,15 +29,24 @@ def Page():
 
     refresh = use_callback(load, deps=[])
     use_effect(load, deps=[])
+
+    links = []
+    for item in [
+        {"label": "Home", "to": "/"},
+        {"label": "Counter", "to": "/counter"},
+        {"label": "API", "to": "/api"},
+    ]:
+        links.append(Link(item["label"], to=item["to"]))
+
+    if status == "Loading...":
+        status_label = h.span("Waiting for response...", class_name="text-xs opacity-80")
+    else:
+        status_label = h.span(f"Ping: {status}", class_name="text-xs opacity-80")
+
     return h.div(
-        h.nav(
-            Link("Home", to="/"),
-            Link("Counter", to="/counter"),
-            Link("API", to="/api"),
-            class_name="flex gap-4 text-sm",
-        ),
+        h.nav(links, class_name="flex gap-4 text-sm"),
         h.h2("Typed API", class_name="text-lg font-semibold"),
-        h.p(f"Ping: {status}", class_name="text-sm"),
+        status_label,
         h.button(
             "Refresh",
             on_click=refresh,
