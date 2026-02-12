@@ -22,7 +22,7 @@ export type ActionClientOptions = {
 export function createActionClient(options: ActionClientOptions = {}) {
   const endpoint = options.endpoint ?? '/_actions';
   const baseUrl = options.baseUrl ?? '';
-  const fetcher = options.fetcher ?? fetch;
+  const fetcher = options.fetcher ?? globalThis.fetch.bind(globalThis);
   return async function callAction<T>(
     action: string,
     args: unknown[] = [],

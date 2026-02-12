@@ -15,16 +15,16 @@ export class ApiClient {
   private _headers: Record<string, string>;
 
   constructor(options: ClientOptions) {
-    this._baseUrl = options.baseUrl.replace(/\/+$/, "");
-    this._fetcher = options.fetcher ?? fetch;
+    this._baseUrl = options.baseUrl.replace(/\/+$/, '');
+    this._fetcher = options.fetcher ?? globalThis.fetch.bind(globalThis);
     this._headers = options.headers ?? {};
   }
 
   private _joinUrl(path: string): string {
-    if (path.startsWith("http://") || path.startsWith("https://")) {
+    if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
-    return `${this._baseUrl}/${path.replace(/^\/+/, "")}`;
+    return `${this._baseUrl}/${path.replace(/^\/+/, '')}`;
   }
 
   async ping(): Promise<string> {

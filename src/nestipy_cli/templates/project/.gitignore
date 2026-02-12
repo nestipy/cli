@@ -8,3 +8,7 @@ __pycache__/*
 logs/*
 !logs/.gitkeep
 !logs/.gitignore
+node_modules/
+web/node_modules/
+web/dist/
+web/.vite/

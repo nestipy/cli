@@ -9,6 +9,12 @@ Build + run both backend and frontend:
 nestipy start --dev --web --web-args "--vite --install"
 ```
 
+Vite proxy defaults to `http://127.0.0.1:8000`. Override with:
+
+```bash
+export NESTIPY_WEB_PROXY=http://127.0.0.1:8001
+```
+
 Regenerate typed action client (optional):
 
 ```bash

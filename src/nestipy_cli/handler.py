@@ -22,11 +22,18 @@ class NestipyCliHandler:
             return False
         self.generator.copy_project(destination)
         if frontend:
-            project_name = os.path.basename(destination.rstrip(os.sep))
+            project_name = self._sanitize_package_name(os.path.basename(destination.rstrip(os.sep)))
             if not project_name:
-                project_name = "nestipy-app"
+                project_name = self._sanitize_package_name("nestipy-app")
             self._add_frontend_scaffold(destination, project_name=project_name)
         return True
+
+
+    @staticmethod
+    def _sanitize_package_name(name: str) -> str:
+        cleaned = re.sub(r"[^a-zA-Z0-9._-]+", "-", name.strip())
+        cleaned = cleaned.strip("-._")
+        return cleaned or "nestipy-app"
 
     def _write_file(self, path: str, content: str) -> None:
         os.makedirs(os.path.dirname(path), exist_ok=True)
