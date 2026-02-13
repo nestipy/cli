@@ -243,10 +243,20 @@ def build_granian_options(cfg: GranianStartConfig) -> dict[str, Any]:
     if cfg.dev and not cfg.reload_any:
         reload_ignore_patterns = PY_RELOAD_IGNORE_PATTERNS + reload_ignore_patterns
     reload_ignore_patterns = reload_ignore_patterns or None
-    reload_paths = cfg.reload_paths or None
+    reload_paths = (
+        [Path(p).resolve() for p in cfg.reload_paths] if cfg.reload_paths else None
+    )
     reload_ignore_dirs = cfg.reload_ignore_dirs or None
-    reload_ignore_paths = cfg.reload_ignore_paths or None
+    reload_ignore_paths = (
+        [Path(p).resolve() for p in cfg.reload_ignore_paths]
+        if cfg.reload_ignore_paths
+        else None
+    )
     access_enabled = not cfg.is_microservice
+    print("[NESTIPY] INFO [RELOAD] paths:", reload_paths)
+    print("[NESTIPY] INFO [RELOAD] ignore_paths:", reload_ignore_paths)
+    print("[NESTIPY] INFO [RELOAD] ignore_dirs:", reload_ignore_dirs)
+    print("[NESTIPY] INFO [RELOAD] ignore_patterns:", reload_ignore_patterns)
     options: dict[str, Any] = {
         "interface": "asgi",
         "host": cfg.host,

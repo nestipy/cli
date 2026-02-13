@@ -314,6 +314,7 @@ def start(
     log_config_path = write_logging_config(config)
     selected_port = select_port(port, is_ms)
     project_root = module_file_path.parent.resolve()
+    cwd_root = Path.cwd().resolve()
     web_process = None
     web_app_dir = None
     if web:
@@ -354,30 +355,57 @@ def start(
         env = os.environ.copy()
         env["NESTIPY_WEB_BACKEND"] = ""
         env["NESTIPY_WEB_BACKEND_CWD"] = ""
-        actions_watch_path = project_root / "src"
-        if actions_watch_path.exists():
-            env.setdefault("NESTIPY_WEB_ACTIONS_WATCH", str(actions_watch_path))
-        else:
-            env.setdefault("NESTIPY_WEB_ACTIONS_WATCH", str(project_root))
+        actions_watch_paths: list[str] = []
+        actions_watch_src = project_root / "src"
+        if actions_watch_src.exists():
+            actions_watch_paths.append(str(actions_watch_src))
+        has_root_py = any(project_root.glob("*.py"))
+        if has_root_py:
+            actions_watch_paths.append(str(project_root))
+        if not actions_watch_paths:
+            actions_watch_paths.append(str(project_root))
+        env.setdefault("NESTIPY_WEB_ACTIONS_WATCH", ",".join(actions_watch_paths))
         web_process = subprocess.Popen(
             ["nestipy", "run", "web:dev", *web_args_list],
             cwd=str(module_file_path.parent),
             env=env,
         )
         atexit.register(lambda: web_process and web_process.terminate())
-    reload_ignore_paths_list = list(reload_ignore_paths)
+    def _abs_path(value: str) -> str:
+        if os.path.isabs(value):
+            return value
+        return str((project_root / value).resolve())
+
+    reload_ignore_paths_list = [_abs_path(p) for p in reload_ignore_paths]
     app_ignore_path = (project_root / "app").resolve()
     if app_ignore_path.exists():
-        app_ignore_str = str(app_ignore_path)
+        app_ignore_str = str(app_ignore_path.resolve())
         if app_ignore_str not in reload_ignore_paths_list:
             reload_ignore_paths_list.append(app_ignore_str)
+
+    page_ignore_path = (project_root / "page").resolve()
+    if page_ignore_path.exists():
+        page_ignore_str = str(page_ignore_path.resolve())
+        if page_ignore_str not in reload_ignore_paths_list:
+            reload_ignore_paths_list.append(page_ignore_str)
+    if cwd_root != project_root:
+        cwd_app_ignore = (cwd_root / "app").resolve()
+        if cwd_app_ignore.exists():
+            cwd_app_ignore_str = str(cwd_app_ignore)
+            if cwd_app_ignore_str not in reload_ignore_paths_list:
+                reload_ignore_paths_list.append(cwd_app_ignore_str)
+        cwd_page_ignore = (cwd_root / "page").resolve()
+        if cwd_page_ignore.exists():
+            cwd_page_ignore_str = str(cwd_page_ignore)
+            if cwd_page_ignore_str not in reload_ignore_paths_list:
+                reload_ignore_paths_list.append(cwd_page_ignore_str)
     if web_app_dir:
         web_app_path = (project_root / web_app_dir).resolve()
         if web_app_path.exists():
-            web_app_path_str = str(web_app_path)
+            web_app_path_str = str(web_app_path.resolve())
             if web_app_path_str not in reload_ignore_paths_list:
                 reload_ignore_paths_list.append(web_app_path_str)
-    reload_paths_list = list(reload_paths)
+    reload_paths_list = [_abs_path(p) for p in reload_paths]
     if dev and not reload_any and not reload_paths_list:
         reload_paths_list.append(str(project_root))
 
