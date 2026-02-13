@@ -6,6 +6,8 @@ import atexit
 import os
 import shlex
 import subprocess
+import threading
+import re
 from pathlib import Path
 from subprocess import DEVNULL, check_call
 from typing import Literal
@@ -318,6 +320,49 @@ def start(
     web_process = None
     web_app_dir = None
     if web:
+        ansi_re = re.compile(r"\x1b\\[[0-9;]*m")
+
+        def _strip_ansi(text: str) -> str:
+            return ansi_re.sub("", text)
+
+        def _handle_web_log(line: str) -> None:
+            text = line.strip()
+            if not text:
+                return
+            lower = text.lower()
+
+            # Skip npm audit messages
+            if "audited" in lower or "packages are looking for funding" in lower or "found 0 vulnerabilities" in lower:
+                return
+
+            # Skip Vite version line but keep other Vite messages
+            if text.startswith("VITE v") and "ready in" not in text:
+                return
+
+            # Handle URL lines
+            if text.startswith("➜") or text.startswith("Local:") or text.startswith("Network:"):
+                match = re.search(r"(https?://\S+)", text)
+                if match:
+                    echo.info(f"[NESTIPY] INFO [WEB] Dev server: {match.group(1)}")
+                return
+
+            # Handle warnings and errors
+            if text.startswith("(!)") or "failed to" in lower or "warning" in lower:
+                echo.warning(f"[NESTIPY] WARNING [WEB] {text}")
+                return
+            if "error" in lower:
+                echo.error(f"[NESTIPY] ERROR [WEB] {text}")
+                return
+
+            # Print other messages (for debugging)
+            echo.info(f"[NESTIPY] INFO [WEB] {text}")
+            # Drop noisy Vite info by default
+
+        def _stream_web_logs(stream) -> None:
+            for raw in iter(stream.readline, ""):
+                _handle_web_log(raw)
+            stream.close()
+
         def _has_flag(args: list[str], flag: str) -> bool:
             return any(arg == flag or arg.startswith(flag + "=") for arg in args)
 
@@ -369,7 +414,16 @@ def start(
             ["nestipy", "run", "web:dev", *web_args_list],
             cwd=str(module_file_path.parent),
             env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            bufsize=1,
         )
+        print(f"Process started with PID: {web_process.pid}")  # Debug line
+        if web_process.stdout is not None:
+            threading.Thread(target=_stream_web_logs, args=(web_process.stdout,), daemon=True).start()
+        if web_process.stderr is not None:
+            threading.Thread(target=_stream_web_logs, args=(web_process.stderr,), daemon=True).start()
         atexit.register(lambda: web_process and web_process.terminate())
     def _abs_path(value: str) -> str:
         if os.path.isabs(value):
