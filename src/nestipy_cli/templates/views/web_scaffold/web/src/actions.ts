@@ -50,7 +50,7 @@ export async function fetchCsrfToken(
   baseUrl = '',
   fetcher: typeof fetch = globalThis.fetch.bind(globalThis),
 ): Promise<string> {
-  const response = await fetcher(baseUrl + endpoint, { method: 'GET' });
+  const response = await fetcher(baseUrl + endpoint, { method: 'GET', credentials: 'include' });
   const payload = (await response.json()) as { csrf?: string };
   return payload.csrf ?? '';
 }
@@ -68,6 +68,29 @@ export function createActionMeta(options: { csrfCookie?: string; includeTs?: boo
     meta.csrf = csrfMeta.csrf;
   }
   return meta;
+}
+
+export function createActionMetaProvider(options: { endpoint?: string; baseUrl?: string; csrfCookie?: string; includeTs?: boolean; includeNonce?: boolean } = {}): ActionMetaProvider {
+  let inflight: Promise<string> | null = null;
+  return async () => {
+    let meta = createActionMeta({
+      csrfCookie: options.csrfCookie,
+      includeTs: options.includeTs,
+      includeNonce: options.includeNonce,
+    });
+    if (!meta.csrf) {
+      if (!inflight) {
+        inflight = fetchCsrfToken(options.endpoint ?? '/_actions/csrf', options.baseUrl ?? '');
+      }
+      await inflight;
+      meta = createActionMeta({
+        csrfCookie: options.csrfCookie,
+        includeTs: options.includeTs,
+        includeNonce: options.includeNonce,
+      });
+    }
+    return meta;
+  };
 }
 
 function stableStringify(value: unknown): string {

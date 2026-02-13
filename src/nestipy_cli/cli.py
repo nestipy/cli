@@ -313,6 +313,7 @@ def start(
 
     log_config_path = write_logging_config(config)
     selected_port = select_port(port, is_ms)
+    project_root = module_file_path.parent.resolve()
     web_process = None
     web_app_dir = None
     if web:
@@ -345,12 +346,19 @@ def start(
         web_args_list = shlex.split(web_args) if web_args else ["--vite"]
         web_args_list = _strip_backend_flags(web_args_list)
         web_app_dir = _extract_web_app_dir(web_args_list)
+        if not _has_flag(web_args_list, "--actions"):
+            web_args_list.append("--actions")
         if not _has_flag(web_args_list, "--proxy") and not os.getenv("NESTIPY_WEB_PROXY"):
             proxy_value = web_proxy or f"{scheme}://{host}:{selected_port}"
             web_args_list.extend(["--proxy", proxy_value])
         env = os.environ.copy()
         env["NESTIPY_WEB_BACKEND"] = ""
         env["NESTIPY_WEB_BACKEND_CWD"] = ""
+        actions_watch_path = project_root / "src"
+        if actions_watch_path.exists():
+            env.setdefault("NESTIPY_WEB_ACTIONS_WATCH", str(actions_watch_path))
+        else:
+            env.setdefault("NESTIPY_WEB_ACTIONS_WATCH", str(project_root))
         web_process = subprocess.Popen(
             ["nestipy", "run", "web:dev", *web_args_list],
             cwd=str(module_file_path.parent),
@@ -358,12 +366,20 @@ def start(
         )
         atexit.register(lambda: web_process and web_process.terminate())
     reload_ignore_paths_list = list(reload_ignore_paths)
+    app_ignore_path = (project_root / "app").resolve()
+    if app_ignore_path.exists():
+        app_ignore_str = str(app_ignore_path)
+        if app_ignore_str not in reload_ignore_paths_list:
+            reload_ignore_paths_list.append(app_ignore_str)
     if web_app_dir:
-        web_app_path = (module_file_path.parent / web_app_dir).resolve()
+        web_app_path = (project_root / web_app_dir).resolve()
         if web_app_path.exists():
             web_app_path_str = str(web_app_path)
             if web_app_path_str not in reload_ignore_paths_list:
                 reload_ignore_paths_list.append(web_app_path_str)
+    reload_paths_list = list(reload_paths)
+    if dev and not reload_any and not reload_paths_list:
+        reload_paths_list.append(str(project_root))
 
     server = create_granian_instance(
         GranianStartConfig(
@@ -379,7 +395,7 @@ def start(
             is_microservice=is_ms,
             log_config_path=log_config_path,
             reload_any=reload_any,
-            reload_paths=list(reload_paths),
+            reload_paths=reload_paths_list,
             reload_ignore_dirs=list(reload_ignore_dirs),
             reload_ignore_patterns=list(reload_ignore_patterns),
             reload_ignore_paths=reload_ignore_paths_list,
