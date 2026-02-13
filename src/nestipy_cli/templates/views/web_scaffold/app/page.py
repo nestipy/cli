@@ -9,7 +9,7 @@ from nestipy.web import (
     external,
     new_,
 )
-from layout import ThemeContext
+from app.layout import ThemeContext
 
 Link = external("react-router-dom", "Link")
 create_actions = external("../actions.client", "createActions", alias="createActions")
@@ -57,88 +57,61 @@ def Page():
             Link(
                 item["label"],
                 to=item["to"],
-                class_name=(
-                    "rounded-full px-4 py-2 text-xs font-medium text-slate-300 "
-                    "hover:bg-slate-800 hover:text-white"
-                ),
+                class_name="nav-link",
             )
         )
 
     if ping == "Loading...":
-        ping_status = h.span("Loading...", class_name="text-sm text-slate-400")
+        ping_status = "Loading API ping..."
     else:
-        ping_status = h.span(f"API ping: {ping}", class_name="text-sm text-slate-300")
+        ping_status = f"API ping: {ping}"
 
-    return h.div(
-        h.nav(
-            links,
-            class_name=(
-                "inline-flex items-center gap-2 rounded-full border border-slate-800 "
-                "bg-slate-900/60 p-1"
+    return h.section(
+        h.div(
+            h.img(
+                src="/nestipy.png",
+                alt="Nestipy logo",
+                class_name="logo nestipy",
             ),
+            h.img(
+                src="/react.svg",
+                alt="React logo",
+                class_name="logo react",
+            ),
+            h.img(
+                src="/vite.svg",
+                alt="Vite logo",
+                class_name="logo vite",
+            ),
+            class_name="logo-row",
         ),
-        h.section(
-            h.div(
-                h.h2(
-                    "Overview",
-                    class_name="text-2xl font-semibold text-slate-100",
-                ),
-                h.p(
-                    "A minimal fullstack starter with actions + typed clients.",
-                    class_name="text-sm text-slate-400",
-                ),
-                class_name="space-y-2",
-            ),
-            h.div(
-                h.div(
-                    h.p("Server Actions", class_name="text-xs uppercase text-slate-500"),
-                    h.p(action_label, class_name="text-base text-slate-200"),
-                    h.div(
-                        h.button(
-                            "Reload Action",
-                            on_click=reload_action,
-                            class_name=(
-                                "rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white "
-                                "hover:bg-blue-500"
-                            ),
-                        ),
-                        class_name="mt-4",
-                    ),
-                    class_name=(
-                        "rounded-2xl border border-slate-800 bg-slate-900/60 p-6 "
-                        "shadow-[0_0_40px_-20px_rgba(59,130,246,0.6)]"
-                    ),
-                ),
-                h.div(
-                    h.p("Typed API", class_name="text-xs uppercase text-slate-500"),
-                    ping_status,
-                    h.div(
-                        h.button(
-                            "Reload API",
-                            on_click=reload_ping,
-                            class_name=(
-                                "rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white "
-                                "hover:bg-slate-600"
-                            ),
-                        ),
-                        class_name="mt-4",
-                    ),
-                    class_name=(
-                        "rounded-2xl border border-slate-800 bg-slate-900/60 p-6 "
-                        "shadow-[0_0_40px_-20px_rgba(15,23,42,0.8)]"
-                    ),
-                ),
-                class_name="grid gap-4 md:grid-cols-2",
-            ),
-            class_name="space-y-6",
+        h.h1("Nestipy Web + React + Vite", class_name="home-title"),
+        h.p(
+            "Build fullstack apps with Python-first UI, typed actions, and fast HMR.",
+            class_name="home-subtitle",
         ),
         h.div(
-            h.span("Theme", class_name="text-xs uppercase text-slate-500"),
-            h.p(
-                f"{theme['theme']} mode active",
-                class_name="text-sm text-slate-300",
+            h.button(
+                "Reload Action",
+                on_click=reload_action,
+                class_name="btn btn-primary",
             ),
-            class_name="rounded-2xl border border-slate-800 bg-slate-900/50 p-4",
+            h.button(
+                "Reload API",
+                on_click=reload_ping,
+                class_name="btn",
+            ),
+            class_name="home-actions",
         ),
-        class_name="space-y-8",
+        h.div(
+            h.p(action_label, class_name="text-sm"),
+            h.p(ping_status, class_name="text-xs text-slate-400"),
+            h.p(
+                f"Theme: {theme['theme']}",
+                class_name="text-xs text-slate-500",
+            ),
+            class_name="home-card",
+        ),
+        h.nav(links, class_name="home-nav"),
+        class_name="home",
     )

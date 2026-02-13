@@ -56,3 +56,32 @@ If you'd like to join them, please [read more here].
 ## License
 
 Nestipy is [MIT licensed](LICENSE).
+
+
+## Nestipy Web (Frontend)
+
+Create a fullstack scaffold with the web UI:
+
+```cmd
+    nestipy new my_app --web
+    cd my_app
+    nestipy start --dev --web --web-args "--vite --install"
+```
+
+### Nested Layouts
+
+You can add `layout.py` files in any folder under `app/`. The compiler nests
+layouts to match the folder structure (similar to Next.js).
+
+- `app/layout.py` wraps every page.
+- `app/api/layout.py` wraps only `/api/*`.
+
+Import rules:
+
+- `from layout import X` resolves to the nearest layout.
+- `from app.layout import X` forces the root layout.
+
+### notfound.py (Planned)
+
+We plan to add `notfound.py` at any level to define client-side 404 screens
+for that subtree, mirroring Next.js behavior.

@@ -64,6 +64,10 @@ class NestipyCliHandler:
             "web_scaffold/app/page.py",
         )
         self._write_template(
+            os.path.join(app_dir, "notfound.py"),
+            "web_scaffold/app/notfound.py",
+        )
+        self._write_template(
             os.path.join(app_dir, "counter", "page.py"),
             "web_scaffold/app/counter/page.py",
         )
@@ -135,6 +139,18 @@ class NestipyCliHandler:
         self._write_template(
             os.path.join(web_dir, "src", "main.tsx"),
             "web_scaffold/web/src/main.tsx",
+        )
+        self._write_template(
+            os.path.join(web_dir, "public", "nestipy.png"),
+            "web_scaffold/web/public/nestipy.png",
+        )
+        self._write_template(
+            os.path.join(web_dir, "public", "react.svg"),
+            "web_scaffold/web/public/react.svg",
+        )
+        self._write_template(
+            os.path.join(web_dir, "public", "vite.svg"),
+            "web_scaffold/web/public/vite.svg",
         )
         self._append_readme(
             destination,

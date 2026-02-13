@@ -3,12 +3,11 @@ from nestipy.web import (
     h,
     use_state,
     use_effect,
-    use_callback,
     use_context,
     external,
     new_,
 )
-from layout import ThemeContext
+from app.layout import ThemeContext
 
 Link = external("react-router-dom", "Link")
 ApiClient = external("../../api/client", "ApiClient")
@@ -17,18 +16,14 @@ ApiClient = external("../../api/client", "ApiClient")
 @component
 def Page():
     theme = use_context(ThemeContext)
-    status, set_status = use_state("Loading...")
+    status, set_status = use_state("Waiting...")
 
     api = new_(ApiClient, {"baseUrl": ""})
 
-    def on_ping(value):
-        set_status(value)
+    def load_ping():
+        api.ping().then(lambda value: set_status(f"API ping: {value}"))
 
-    def load():
-        api.ping().then(on_ping)
-
-    refresh = use_callback(load, deps=[])
-    use_effect(load, deps=[])
+    use_effect(load_ping, deps=[])
 
     links = []
     for item in [
@@ -40,45 +35,32 @@ def Page():
             Link(
                 item["label"],
                 to=item["to"],
-                class_name=(
-                    "rounded-full px-4 py-2 text-xs font-medium text-slate-300 "
-                    "hover:bg-slate-800 hover:text-white"
-                ),
+                class_name="nav-link",
             )
         )
 
-    if status == "Loading...":
-        status_label = h.span("Waiting for response...", class_name="text-sm text-slate-400")
-    else:
-        status_label = h.span(f"Ping: {status}", class_name="text-sm text-slate-300")
-
-    return h.div(
-        h.nav(
-            links,
-            class_name=(
-                "inline-flex items-center gap-2 rounded-full border border-slate-800 "
-                "bg-slate-900/60 p-1"
-            ),
-        ),
+    return h.section(
+        h.nav(links, class_name="home-nav"),
         h.div(
-            status_label,
-            h.button(
-                "Refresh",
-                on_click=refresh,
-                class_name=(
-                    "mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white "
-                    "hover:bg-blue-500"
-                ),
-            ),
-            class_name="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6",
-        ),
-        h.div(
-            h.span("Theme", class_name="text-xs uppercase text-slate-500"),
+            h.h2("API Playground", class_name="text-2xl font-semibold text-slate-100"),
             h.p(
-                f"{theme['theme']} mode active",
-                class_name="text-sm text-slate-300",
+                "Ping the backend using the generated typed client.",
+                class_name="text-sm text-slate-400",
             ),
-            class_name="rounded-2xl border border-slate-800 bg-slate-900/40 p-4",
+            class_name="space-y-2 text-center",
         ),
-        class_name="space-y-6",
+        h.div(
+            h.p(status, class_name="text-base text-slate-200"),
+            h.button(
+                "Reload API",
+                on_click=load_ping,
+                class_name="btn",
+            ),
+            class_name="home-card",
+        ),
+        h.p(
+            f"Theme: {theme['theme']}",
+            class_name="text-xs text-slate-500",
+        ),
+        class_name="page",
     )
