@@ -320,44 +320,12 @@ def start(
     web_process = None
     web_app_dir = None
     if web:
-        ansi_re = re.compile(r"\x1b\\[[0-9;]*m")
+        ansi_re = re.compile(r"\x1b\[[0-9;]*m")
 
         def _strip_ansi(text: str) -> str:
             return ansi_re.sub("", text)
 
-        def _handle_web_log(line: str) -> None:
-            text = line.strip()
-            if not text:
-                return
-            lower = text.lower()
-
-            # Skip npm audit messages
-            if "audited" in lower or "packages are looking for funding" in lower or "found 0 vulnerabilities" in lower:
-                return
-
-            # Skip Vite version line but keep other Vite messages
-            if text.startswith("VITE v") and "ready in" not in text:
-                return
-
-            # Handle URL lines
-            if text.startswith("➜") or text.startswith("Local:") or text.startswith("Network:"):
-                match = re.search(r"(https?://\S+)", text)
-                if match:
-                    echo.info(f"[NESTIPY] INFO [WEB] Dev server: {match.group(1)}")
-                return
-
-            # Handle warnings and errors
-            if text.startswith("(!)") or "failed to" in lower or "warning" in lower:
-                echo.warning(f"[NESTIPY] WARNING [WEB] {text}")
-                return
-            if "error" in lower:
-                echo.error(f"[NESTIPY] ERROR [WEB] {text}")
-                return
-
-            # Print other messages (for debugging)
-            echo.info(f"[NESTIPY] INFO [WEB] {text}")
-            # Drop noisy Vite info by default
-
+        # Your existing functions
         def _stream_web_logs(stream) -> None:
             for raw in iter(stream.readline, ""):
                 _handle_web_log(raw)
@@ -389,6 +357,126 @@ def start(
                     return arg.split("=", 1)[1]
             return "app"
 
+        # New helper functions
+        def _handle_file_change(line: str) -> None:
+            """Process file change events from Vite"""
+            text = re.sub(r'\x1b\[[0-9;]*m', '', line).strip()
+            match = re.search(r"\[vite\]\s+(.+)", text)
+            if match:
+                payload = match.group(1).strip()
+                if payload.startswith("(client)"):
+                    payload = payload.replace("(client)", "").strip()
+                lower_payload = payload.lower()
+                if lower_payload.startswith("hmr update"):
+                    payload = payload[len("hmr update"):].strip()
+                    message = f"[NESTIPY] INFO [WEB] File changed HMR UPDATE {payload}"
+                elif lower_payload.startswith("page reload"):
+                    payload = payload[len("page reload"):].strip()
+                    message = f"[NESTIPY] INFO [WEB] File changed PAGE RELOAD {payload}"
+                else:
+                    message = f"[NESTIPY] INFO [WEB] File changed {payload}"
+                echo.info(message)
+                return
+
+            parts = text.split()
+            if len(parts) < 2:
+                return
+
+            change_type = parts[0]
+            file_path = " ".join(parts[1:]).strip()
+
+            if change_type == "✓":
+                change_type = "updated"
+            elif change_type == "✗":
+                change_type = "error"
+
+            message = f"[NESTIPY] INFO [WEB] File changed {change_type.upper()} {file_path}"
+            echo.info(message)
+
+        def _handle_build_progress(line: str) -> None:
+            """Process build progress messages from Vite"""
+            if "compiled successfully" in line.lower():
+                match = re.search(r"(\d+\.\d+)ms", line)
+                if match:
+                    time_ms = match.group(1)
+                    echo.success(f"[NESTIPY] BUILD SUCCESS [WEB] Compiled in {time_ms}")
+                else:
+                    echo.success(f"[NESTIPY] BUILD SUCCESS [WEB] Compiled successfully")
+                return
+
+            if "transforming" in line.lower() or "compiling" in line.lower():
+                match = re.search(r"transforming|compiling\s+(.+)", line, re.IGNORECASE)
+                if match:
+                    file_path = match.group(1).strip()
+                    echo.info(f"[NESTIPY] BUILD PROGRESS [WEB] Processing {file_path}")
+                else:
+                    echo.info(f"[NESTIPY] BUILD PROGRESS [WEB] {line}")
+                return
+
+            if "error" in line.lower():
+                echo.error(f"[NESTIPY] BUILD ERROR [WEB] {line}")
+                return
+
+        ansi_re = re.compile(r"\x1b\[[0-9;]*m")
+        web_log_level = os.getenv("NESTIPY_WEB_LOG_LEVEL", "normal").lower()
+
+        def _strip_ansi(text: str) -> str:
+            return ansi_re.sub("", text)
+
+        # Enhanced log handler
+        def _handle_web_log(line: str) -> None:
+            text = _strip_ansi(line).strip()
+            if not text:
+                return
+
+            lower = text.lower()
+
+            if "audited" in lower or "packages are looking for funding" in lower or "found 0 vulnerabilities" in lower:
+                return
+
+            if web_log_level in {"quiet", "normal"} and text.startswith("VITE v") and "ready in" not in text:
+                return
+
+            match = re.search(r"(https?://\S+)", text)
+            if match and web_log_level != "silent":
+                url = match.group(1)
+                if (
+                    "localhost" in url
+                    or "127.0.0.1" in url
+                    or "0.0.0.0" in url
+                    or text.strip().startswith("Local:")
+                    or text.strip().startswith("Network:")
+                ):
+                    echo.info(f"[NESTIPY] INFO [WEB] Dev server: {url}")
+                    return
+
+            if text.startswith("(!)") or "failed to" in lower or "warning" in lower:
+                echo.warning(f"[NESTIPY] WARNING [WEB] {text}")
+                return
+            if "error" in lower:
+                echo.error(f"[NESTIPY] ERROR [WEB] {text}")
+                return
+
+            if web_log_level in {"normal", "verbose"}:
+                if (
+                    "updated" in lower
+                    or "created" in lower
+                    or "deleted" in lower
+                    or "hmr" in lower
+                    or "hot updated" in lower
+                    or "page reload" in lower
+                ):
+                    _handle_file_change(text)
+                    return
+
+                if "transforming" in lower or "compiling" in lower or "building" in lower:
+                    _handle_build_progress(text)
+                    return
+
+            if web_log_level == "verbose":
+                echo.info(f"[NESTIPY] INFO [WEB] {text}")
+
+        # Your existing code continues...
         web_args_list = shlex.split(web_args) if web_args else ["--vite"]
         web_args_list = _strip_backend_flags(web_args_list)
         web_app_dir = _extract_web_app_dir(web_args_list)
@@ -419,7 +507,11 @@ def start(
             text=True,
             bufsize=1,
         )
-        print(f"Process started with PID: {web_process.pid}")  # Debug line
+        if web_process.stdout is not None:
+            threading.Thread(target=_stream_web_logs, args=(web_process.stdout,), daemon=True).start()
+        if web_process.stderr is not None:
+            threading.Thread(target=_stream_web_logs, args=(web_process.stderr,), daemon=True).start()
+        atexit.register(lambda: web_process and web_process.terminate())
         if web_process.stdout is not None:
             threading.Thread(target=_stream_web_logs, args=(web_process.stdout,), daemon=True).start()
         if web_process.stderr is not None:

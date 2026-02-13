@@ -253,10 +253,10 @@ def build_granian_options(cfg: GranianStartConfig) -> dict[str, Any]:
         else None
     )
     access_enabled = not cfg.is_microservice
-    print("[NESTIPY] INFO [RELOAD] paths:", reload_paths)
-    print("[NESTIPY] INFO [RELOAD] ignore_paths:", reload_ignore_paths)
-    print("[NESTIPY] INFO [RELOAD] ignore_dirs:", reload_ignore_dirs)
-    print("[NESTIPY] INFO [RELOAD] ignore_patterns:", reload_ignore_patterns)
+    # print("[NESTIPY] INFO [RELOAD] paths:", reload_paths)
+    # print("[NESTIPY] INFO [RELOAD] ignore_paths:", reload_ignore_paths)
+    # print("[NESTIPY] INFO [RELOAD] ignore_dirs:", reload_ignore_dirs)
+    # print("[NESTIPY] INFO [RELOAD] ignore_patterns:", reload_ignore_patterns)
     options: dict[str, Any] = {
         "interface": "asgi",
         "host": cfg.host,
