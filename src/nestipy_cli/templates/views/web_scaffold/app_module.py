@@ -7,7 +7,14 @@ from app_actions import AppActions
 
 
 @Module(
-    imports=[ActionsModule.for_root(ActionsOption(path="/_actions"))],
+    imports=[
+        ActionsModule.for_root(
+            ActionsOption(
+                path="/_actions",
+                # guards=[OriginActionGuard(allowed_origins=["http://localhost:5173"]), CsrfActionGuard()],
+            )
+        )
+    ],
     controllers=[AppController],
     providers=[AppService, AppActions],
 )

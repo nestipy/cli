@@ -44,6 +44,9 @@ class NestipyCliHandler:
         content = self.generator.render_template(template, **kwargs)
         self._write_file(path, content)
 
+    def _copy_template(self, path: str, template: str) -> None:
+        self.generator.copy_template_file(template, path)
+
     def _append_readme(self, destination: str, content: str) -> None:
         readme_path = os.path.join(destination, "README.md")
         if not os.path.exists(readme_path):
@@ -140,7 +143,7 @@ class NestipyCliHandler:
             os.path.join(web_dir, "src", "main.tsx"),
             "web_scaffold/web/src/main.tsx",
         )
-        self._write_template(
+        self._copy_template(
             os.path.join(web_dir, "public", "nestipy.png"),
             "web_scaffold/web/public/nestipy.png",
         )

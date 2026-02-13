@@ -114,8 +114,8 @@ a {
 
 .btn-primary {
   border-color: transparent;
-  background: linear-gradient(120deg, #16a34a, #22c55e);
-  color: #0b1120;
+  background: linear-gradient(120deg, #c10e0e, #c10e0e);
+  color: #f4f4f4;
 }
 
 .home-card {

@@ -34,6 +34,7 @@ def Page():
         links.append(
             Link(
                 item["label"],
+                key=item["to"],
                 to=item["to"],
                 class_name="nav-link",
             )

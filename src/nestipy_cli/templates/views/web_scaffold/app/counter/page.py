@@ -41,6 +41,7 @@ def Page():
             Link(
                 item["label"],
                 to=item["to"],
+                key=item["to"],
                 class_name="nav-link",
             )
         )

@@ -1,12 +1,12 @@
-import { createActionClient, ActionClientOptions } from './actions';
+import { createActionClient, ActionClientOptions, createActionMeta } from './actions';
 
 export function createActions(options: ActionClientOptions = {}) {
-  const call = createActionClient(options);
+  const call = createActionClient({
+    ...options,
+    meta: options.meta ?? (() => createActionMeta()),
+  });
   return {
-    AppActions: {
-      hello: (params: { name?: string } = {}) =>
-        call<string>('AppActions.hello', [], params),
-    },
+    actions: {},
     call,
   };
 }
