@@ -69,6 +69,7 @@ def new(name, web: bool):
         f"\n\tuv sync \n\tnestipy start --dev"
     )
     if web:
+        show_web_install_log = os.getenv("NESTIPY_WEB_INSTALL_LOG", "0") in {"1", "true", "yes", "on"}
         message += (
             "\n\nFrontend dev (Vite + backend):"
             "\n\tnestipy start --dev --web --web-args \"--vite --install\""
@@ -419,6 +420,12 @@ def start(
 
         ansi_re = re.compile(r"\x1b\[[0-9;]*m")
         web_log_level = os.getenv("NESTIPY_WEB_LOG_LEVEL", "normal").lower()
+        show_web_install_log = os.getenv("NESTIPY_WEB_INSTALL_LOG", "0") in {
+            "1",
+            "true",
+            "yes",
+            "on",
+        }
 
         def _strip_ansi(text: str) -> str:
             return ansi_re.sub("", text)
@@ -432,6 +439,14 @@ def start(
             lower = text.lower()
 
             if "audited" in lower or "packages are looking for funding" in lower or "found 0 vulnerabilities" in lower:
+                return
+            if show_web_install_log and (
+                "added" in lower
+                or "up to date" in lower
+                or "installed" in lower
+                or "packages:" in lower
+            ):
+                echo.info(f"[NESTIPY] INFO [WEB] {text}")
                 return
 
             if web_log_level in {"quiet", "normal"} and text.startswith("VITE v") and "ready in" not in text:

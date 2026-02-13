@@ -51,7 +51,7 @@ def Page():
     for item in [
         {"label": "Home", "to": "/"},
         {"label": "Counter", "to": "/counter"},
-        {"label": "API", "to": "/api"},
+        {"label": "API", "to": "/api-call"},
     ]:
         links.append(
             Link(

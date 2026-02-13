@@ -75,12 +75,12 @@ class NestipyCliHandler:
             "web_scaffold/app/counter/page.py",
         )
         self._write_template(
-            os.path.join(app_dir, "api", "page.py"),
-            "web_scaffold/app/api/page.py",
+            os.path.join(app_dir, "api-call", "page.py"),
+            "web_scaffold/app/api-call/page.py",
         )
         self._write_template(
-            os.path.join(app_dir, "api", "layout.py"),
-            "web_scaffold/app/api/layout.py",
+            os.path.join(app_dir, "api-call", "layout.py"),
+            "web_scaffold/app/api-call/layout.py",
         )
         self._write_template(
             os.path.join(destination, "app_actions.py"),
