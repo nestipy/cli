@@ -11,7 +11,7 @@ export default defineConfig({
       '/_actions': { target: backend, changeOrigin: true },
       '/_router': { target: backend, changeOrigin: true },
       '/_devtools': { target: backend, changeOrigin: true },
-      '/api': { target: backend, changeOrigin: true },
+      '^/api(/|$)': { target: backend, changeOrigin: true },
     },
   },
 });

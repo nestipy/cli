@@ -14,14 +14,14 @@ class NestipyCliHandler:
     def __init__(self):
         self.generator = TemplateGenerator()
 
-    def create_project(self, name, frontend: bool = False) -> bool:
+    def create_project(self, name, web: bool = False) -> bool:
         destination = os.path.join(os.getcwd(), name)
         if name == ".":
             destination = os.getcwd()
         if os.path.exists(destination) and name != ".":
             return False
         self.generator.copy_project(destination)
-        if frontend:
+        if web:
             project_name = self._sanitize_package_name(os.path.basename(destination.rstrip(os.sep)))
             if not project_name:
                 project_name = self._sanitize_package_name("nestipy-app")

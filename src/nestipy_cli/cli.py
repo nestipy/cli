@@ -48,17 +48,17 @@ def main():
 @main.command(aliases=["n"])
 @click.argument("name")
 @click.option(
-    "--frontend",
+    "--web",
     is_flag=True,
     default=False,
     help="Include Nestipy Web scaffold with hooks + actions example.",
 )
-def new(name, frontend: bool):
+def new(name, web: bool):
     """Create new project"""
     # if not shutil.which('poetry'):
     # curl -sSL https://install.python-poetry.org | python3 -
     click.clear()
-    created = handler.create_project(name, frontend=frontend)
+    created = handler.create_project(name, web=web)
     if not created:
         echo.error(f"Folder {name} already exist.")
         return
@@ -66,7 +66,7 @@ def new(name, frontend: bool):
         f"Project {name} created successfully.\nStart your project by running:\n\tcd {name}"
         f"\n\tuv sync \n\tnestipy start --dev"
     )
-    if frontend:
+    if web:
         message += (
             "\n\nFrontend dev (Vite + backend):"
             "\n\tnestipy start --dev --web --web-args \"--vite --install\""
@@ -263,6 +263,7 @@ def start(
     log_config_path = write_logging_config(config)
     selected_port = select_port(port, is_ms)
     web_process = None
+    web_app_dir = None
     if web:
         def _has_flag(args: list[str], flag: str) -> bool:
             return any(arg == flag or arg.startswith(flag + "=") for arg in args)
@@ -282,8 +283,17 @@ def start(
                 cleaned.append(arg)
             return cleaned
 
+        def _extract_web_app_dir(args: list[str]) -> str:
+            for i, arg in enumerate(args):
+                if arg == "--app-dir" and i + 1 < len(args):
+                    return args[i + 1]
+                if arg.startswith("--app-dir="):
+                    return arg.split("=", 1)[1]
+            return "app"
+
         web_args_list = shlex.split(web_args) if web_args else ["--vite"]
         web_args_list = _strip_backend_flags(web_args_list)
+        web_app_dir = _extract_web_app_dir(web_args_list)
         if not _has_flag(web_args_list, "--proxy") and not os.getenv("NESTIPY_WEB_PROXY"):
             proxy_value = web_proxy or f"{scheme}://{host}:{selected_port}"
             web_args_list.extend(["--proxy", proxy_value])
@@ -296,6 +306,14 @@ def start(
             env=env,
         )
         atexit.register(lambda: web_process and web_process.terminate())
+    reload_ignore_paths_list = list(reload_ignore_paths)
+    if web_app_dir:
+        web_app_path = (module_file_path.parent / web_app_dir).resolve()
+        if web_app_path.exists():
+            web_app_path_str = str(web_app_path)
+            if web_app_path_str not in reload_ignore_paths_list:
+                reload_ignore_paths_list.append(web_app_path_str)
+
     server = create_granian_instance(
         GranianStartConfig(
             app_path=app_path,
@@ -313,7 +331,7 @@ def start(
             reload_paths=list(reload_paths),
             reload_ignore_dirs=list(reload_ignore_dirs),
             reload_ignore_patterns=list(reload_ignore_patterns),
-            reload_ignore_paths=list(reload_ignore_paths),
+            reload_ignore_paths=reload_ignore_paths_list,
             reload_tick=reload_tick,
             reload_ignore_worker_failure=reload_ignore_worker_failure,
         )
