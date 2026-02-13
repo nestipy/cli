@@ -114,11 +114,30 @@ def Page():
             class_name="hero",
         ),
         h.div(
-            h.img(src="/nestipy.png", alt="Nestipy logo", class_name="logo nestipy"),
-            h.img(src="/react.svg", alt="React logo", class_name="logo react"),
-            h.img(src="/vite.svg", alt="Vite logo", class_name="logo vite"),
+            h.a(
+                h.img(src="/nestipy.png", alt="Nestipy logo", class_name="logo nestipy"),
+                href="https://github.com/nestipy/nestipy",
+                target="_blank",
+                rel="noreferrer",
+                class_name="logo-link",
+            ),
+            h.a(
+                h.img(src="/react.svg", alt="React logo", class_name="logo react"),
+                href="https://react.dev",
+                target="_blank",
+                rel="noreferrer",
+                class_name="logo-link",
+            ),
+            h.a(
+                h.img(src="/vite.svg", alt="Vite logo", class_name="logo vite"),
+                href="https://vitejs.dev",
+                target="_blank",
+                rel="noreferrer",
+                class_name="logo-link",
+            ),
             class_name="logo-row",
         ),
+        h.p("Click the logos to learn more.", class_name="logo-caption"),
         h.div(
             h.div(
                 h.p(action_label, class_name="card-title"),
@@ -132,7 +151,7 @@ def Page():
             ),
             class_name="card status-card",
         ),
-        h.div(features, class_name="feature-grid"),
-        h.div(stats, class_name="stat-grid"),
-        class_name="home",
+        h.div(features, class_name="feature-grid gap-4"),
+        h.div(stats, class_name="stat-grid gap-4"),
+        class_name="home space-y-8",
     )

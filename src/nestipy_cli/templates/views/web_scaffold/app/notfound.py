@@ -7,7 +7,7 @@ def NotFound():
         h.div(
             h.h1("Page not found", class_name="page-title"),
             h.p(
-                "This route does not exist yet. We'll add nested notfound handling soon.",
+                "This route does not exist yet. Check your navigation or update routes.",
                 class_name="page-subtitle",
             ),
             class_name="page-header",
