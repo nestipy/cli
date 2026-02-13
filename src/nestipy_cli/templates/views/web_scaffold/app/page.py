@@ -116,7 +116,7 @@ def Page():
         h.div(
             h.a(
                 h.img(src="/nestipy.png", alt="Nestipy logo", class_name="logo nestipy"),
-                href="https://github.com/nestipy/nestipy",
+                href="https://nestipy.vercel.app",
                 target="_blank",
                 rel="noreferrer",
                 class_name="logo-link",
