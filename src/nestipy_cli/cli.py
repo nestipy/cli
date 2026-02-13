@@ -330,9 +330,16 @@ def start(
 
         # Your existing functions
         def _stream_web_logs(stream) -> None:
-            for raw in iter(stream.readline, ""):
-                _handle_web_log(raw)
-            stream.close()
+            try:
+                for raw in iter(stream.readline, ""):
+                    _handle_web_log(raw)
+            except ValueError:
+                return
+            finally:
+                try:
+                    stream.close()
+                except Exception:
+                    pass
 
         def _has_flag(args: list[str], flag: str) -> bool:
             return any(arg == flag or arg.startswith(flag + "=") for arg in args)
@@ -440,6 +447,14 @@ def start(
 
             lower = text.lower()
 
+            if text.startswith("[NESTIPY] INFO [WEB]"):
+                echo.info(text)
+                return
+
+            if "install:" in lower and "[web]" in lower:
+                echo.info(text)
+                return
+
             if "audited" in lower or "packages are looking for funding" in lower or "found 0 vulnerabilities" in lower:
                 return
             if show_web_install_log and (
@@ -497,6 +512,9 @@ def start(
         web_args_list = shlex.split(web_args) if web_args else ["--vite"]
         web_args_list = _strip_backend_flags(web_args_list)
         web_app_dir = _extract_web_app_dir(web_args_list)
+        if "--install" in web_args_list:
+            show_web_install_log = True
+            echo.info("[NESTIPY] INFO [WEB] Installing frontend dependencies...")
         if not _has_flag(web_args_list, "--actions"):
             web_args_list.append("--actions")
         if not _has_flag(web_args_list, "--proxy") and not os.getenv("NESTIPY_WEB_PROXY"):

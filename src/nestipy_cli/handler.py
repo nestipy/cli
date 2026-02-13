@@ -71,6 +71,10 @@ class NestipyCliHandler:
             "web_scaffold/app/notfound.py",
         )
         self._write_template(
+            os.path.join(app_dir, "error.py"),
+            "web_scaffold/app/error.py",
+        )
+        self._write_template(
             os.path.join(app_dir, "counter", "page.py"),
             "web_scaffold/app/counter/page.py",
         )
@@ -89,6 +93,10 @@ class NestipyCliHandler:
         self._write_template(
             os.path.join(destination, "app_controller.py"),
             "web_scaffold/app_controller.py",
+        )
+        self._write_template(
+            os.path.join(destination, "app_service.py"),
+            "web_scaffold/app_service.py",
         )
         self._write_template(
             os.path.join(destination, "app_module.py"),

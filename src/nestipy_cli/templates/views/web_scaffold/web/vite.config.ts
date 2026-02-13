@@ -13,5 +13,6 @@ export default defineConfig({
       '/_devtools': { target: backend, changeOrigin: true },
       '^/api(/|$)': { target: backend, changeOrigin: true },
     },
+    port: 2345,
   },
 });
