@@ -81,6 +81,26 @@ Import rules:
 - `from layout import X` resolves to the nearest layout.
 - `from app.layout import X` forces the root layout.
 
+### Action Security (Presets)
+
+The CLI exposes flags to enable default Web Action security presets. These map
+to environment variables consumed by `ActionsModule.for_root`.
+
+Examples:
+
+```
+nestipy start --dev --action-security --action-origins "http://localhost:5173" --action-csrf
+```
+
+Available flags:
+
+- `--action-security/--no-action-security`
+- `--action-origins`
+- `--action-allow-missing-origin/--no-action-allow-missing-origin`
+- `--action-csrf/--no-action-csrf`
+- `--action-signature-secret`
+- `--action-permissions/--no-action-permissions`
+
 ### notfound.py (Planned)
 
 We plan to add `notfound.py` at any level to define client-side 404 screens

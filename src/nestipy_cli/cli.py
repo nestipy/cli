@@ -153,6 +153,36 @@ current_task = None
     default=None,
     help="Proxy URL for web dev server (defaults to backend address).",
 )
+@click.option(
+    "--action-security/--no-action-security",
+    default=None,
+    help="Enable or disable default action security presets.",
+)
+@click.option(
+    "--action-origins",
+    default=None,
+    help="Comma-separated list of allowed action origins.",
+)
+@click.option(
+    "--action-allow-missing-origin/--no-action-allow-missing-origin",
+    default=None,
+    help="Allow missing Origin header for actions.",
+)
+@click.option(
+    "--action-csrf/--no-action-csrf",
+    default=None,
+    help="Enable or disable CSRF guard for actions.",
+)
+@click.option(
+    "--action-signature-secret",
+    default=None,
+    help="Secret for action HMAC signatures.",
+)
+@click.option(
+    "--action-permissions/--no-action-permissions",
+    default=None,
+    help="Enable or disable ActionPermissionGuard in presets.",
+)
 def start(
     app_path: str,
     dev: bool,
@@ -173,6 +203,12 @@ def start(
     web: bool,
     web_args: str,
     web_proxy: str | None,
+    action_security: bool | None,
+    action_origins: str | None,
+    action_allow_missing_origin: bool | None,
+    action_csrf: bool | None,
+    action_signature_secret: str | None,
+    action_permissions: bool | None,
 ) -> None:
     """Starting nestipy server"""
     try:
@@ -211,6 +247,21 @@ def start(
     module_file_path = Path(module_path).resolve()
     module_name = module_file_path.stem
     sys.path.append(str(module_file_path.parent))
+
+    if action_security is not None:
+        os.environ["NESTIPY_ACTION_SECURITY"] = "1" if action_security else "0"
+    if action_origins:
+        os.environ["NESTIPY_ACTION_ALLOWED_ORIGINS"] = action_origins
+    if action_allow_missing_origin is not None:
+        os.environ["NESTIPY_ACTION_ALLOW_MISSING_ORIGIN"] = (
+            "1" if action_allow_missing_origin else "0"
+        )
+    if action_csrf is not None:
+        os.environ["NESTIPY_ACTION_CSRF"] = "1" if action_csrf else "0"
+    if action_signature_secret is not None:
+        os.environ["NESTIPY_ACTION_SIGNATURE_SECRET"] = action_signature_secret
+    if action_permissions is not None:
+        os.environ["NESTIPY_ACTION_PERMISSIONS"] = "1" if action_permissions else "0"
 
     def import_app():
         mod = importlib.import_module(module_name)
