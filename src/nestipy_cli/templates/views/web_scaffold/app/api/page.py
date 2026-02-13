@@ -60,28 +60,17 @@ def Page():
                 "bg-slate-900/60 p-1"
             ),
         ),
-        h.section(
-            h.div(
-                h.h2("Typed API", class_name="text-2xl font-semibold text-slate-100"),
-                h.p(
-                    "Generated HTTP client powered by RouterSpec.",
-                    class_name="text-sm text-slate-400",
+        h.div(
+            status_label,
+            h.button(
+                "Refresh",
+                on_click=refresh,
+                class_name=(
+                    "mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white "
+                    "hover:bg-blue-500"
                 ),
-                class_name="space-y-2",
             ),
-            h.div(
-                status_label,
-                h.button(
-                    "Refresh",
-                    on_click=refresh,
-                    class_name=(
-                        "mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white "
-                        "hover:bg-blue-500"
-                    ),
-                ),
-                class_name="rounded-2xl border border-slate-800 bg-slate-900/60 p-6",
-            ),
-            class_name="space-y-6",
+            class_name="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6",
         ),
         h.div(
             h.span("Theme", class_name="text-xs uppercase text-slate-500"),
@@ -89,7 +78,7 @@ def Page():
                 f"{theme['theme']} mode active",
                 class_name="text-sm text-slate-300",
             ),
-            class_name="rounded-2xl border border-slate-800 bg-slate-900/50 p-4",
+            class_name="rounded-2xl border border-slate-800 bg-slate-900/40 p-4",
         ),
-        class_name="space-y-8",
+        class_name="space-y-6",
     )
