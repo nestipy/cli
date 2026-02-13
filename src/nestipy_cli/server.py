@@ -259,7 +259,7 @@ def build_granian_options(cfg: GranianStartConfig) -> dict[str, Any]:
     # print("[NESTIPY] INFO [RELOAD] ignore_patterns:", reload_ignore_patterns)
     options: dict[str, Any] = {
         "interface": "asgi",
-        "host": cfg.host,
+        "address": cfg.host,
         "port": cfg.port,
         "workers": cfg.workers,
         "loop": cfg.loop,

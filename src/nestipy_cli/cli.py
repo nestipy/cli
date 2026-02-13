@@ -322,6 +322,8 @@ def start(
     web_app_dir = None
     if web:
         ansi_re = re.compile(r"\x1b\[[0-9;]*m")
+        if dev:
+            os.environ["NESTIPY_WEB_DEV"] = "1"
 
         def _strip_ansi(text: str) -> str:
             return ansi_re.sub("", text)
