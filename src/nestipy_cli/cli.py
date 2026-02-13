@@ -377,34 +377,22 @@ def start(
         return str((project_root / value).resolve())
 
     reload_ignore_paths_list = [_abs_path(p) for p in reload_ignore_paths]
-    app_ignore_path = (project_root / "app").resolve()
-    if app_ignore_path.exists():
-        app_ignore_str = str(app_ignore_path.resolve())
-        if app_ignore_str not in reload_ignore_paths_list:
-            reload_ignore_paths_list.append(app_ignore_str)
-
-    page_ignore_path = (project_root / "page").resolve()
-    if page_ignore_path.exists():
-        page_ignore_str = str(page_ignore_path.resolve())
-        if page_ignore_str not in reload_ignore_paths_list:
-            reload_ignore_paths_list.append(page_ignore_str)
+    reload_ignore_dirs_list = list(reload_ignore_dirs)
+    if (project_root / "app").exists() and "app" not in reload_ignore_dirs_list:
+        reload_ignore_dirs_list.append("app")
+    if (project_root / "page").exists() and "page" not in reload_ignore_dirs_list:
+        reload_ignore_dirs_list.append("page")
     if cwd_root != project_root:
-        cwd_app_ignore = (cwd_root / "app").resolve()
-        if cwd_app_ignore.exists():
-            cwd_app_ignore_str = str(cwd_app_ignore)
-            if cwd_app_ignore_str not in reload_ignore_paths_list:
-                reload_ignore_paths_list.append(cwd_app_ignore_str)
-        cwd_page_ignore = (cwd_root / "page").resolve()
-        if cwd_page_ignore.exists():
-            cwd_page_ignore_str = str(cwd_page_ignore)
-            if cwd_page_ignore_str not in reload_ignore_paths_list:
-                reload_ignore_paths_list.append(cwd_page_ignore_str)
+        if (cwd_root / "app").exists() and "app" not in reload_ignore_dirs_list:
+            reload_ignore_dirs_list.append("app")
+        if (cwd_root / "page").exists() and "page" not in reload_ignore_dirs_list:
+            reload_ignore_dirs_list.append("page")
     if web_app_dir:
         web_app_path = (project_root / web_app_dir).resolve()
         if web_app_path.exists():
-            web_app_path_str = str(web_app_path.resolve())
-            if web_app_path_str not in reload_ignore_paths_list:
-                reload_ignore_paths_list.append(web_app_path_str)
+            web_app_name = web_app_path.name
+            if web_app_name not in reload_ignore_dirs_list:
+                reload_ignore_dirs_list.append(web_app_name)
     reload_paths_list = [_abs_path(p) for p in reload_paths]
     if dev and not reload_any and not reload_paths_list:
         reload_paths_list.append(str(project_root))
@@ -424,7 +412,7 @@ def start(
             log_config_path=log_config_path,
             reload_any=reload_any,
             reload_paths=reload_paths_list,
-            reload_ignore_dirs=list(reload_ignore_dirs),
+            reload_ignore_dirs=reload_ignore_dirs_list,
             reload_ignore_patterns=list(reload_ignore_patterns),
             reload_ignore_paths=reload_ignore_paths_list,
             reload_tick=reload_tick,
