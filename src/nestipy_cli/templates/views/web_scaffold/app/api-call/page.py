@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from nestipy.web import (
     component,
     h,
@@ -5,24 +9,27 @@ from nestipy.web import (
     use_effect,
     use_context,
     external,
-    new_,
+    external_fn,
 )
-from app.state import ThemeContext, ThemeContextValue, use_app_store
+from app.state import ThemeContext, use_app_store
 
-ApiClient = external("../../api/client", "ApiClient")
+if TYPE_CHECKING:
+    from app.state import ThemeContextValue
+
+create_api_client = external_fn("../../api/client", "createApiClient", alias="createApiClient")
 
 
 @component
 def Page():
-    theme: ThemeContextValue = use_context(ThemeContext)
+    theme: "ThemeContextValue" = use_context(ThemeContext)
     status, set_status = use_state("Waiting...")
     shared_count = use_app_store(lambda state: state.sharedCount)
     inc_shared = use_app_store(lambda state: state.incShared)
 
-    api = new_(ApiClient, {"baseUrl": ""})
+    api = create_api_client()
 
     def load_ping():
-        api.ping().then(lambda value: set_status(f"API ping: {value}"))
+        api.App.ping().then(lambda value: set_status(f"API ping: {value}"))
 
     use_effect(load_ping, deps=[])
 

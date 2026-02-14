@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from nestipy.web import (
     component,
     h,
@@ -7,25 +11,28 @@ from nestipy.web import (
     use_callback,
     use_context,
     external,
-    new_,
+    external_fn,
 )
-from app.state import ThemeContext, ThemeContextValue, use_app_store
+from app.state import ThemeContext, use_app_store
+
+if TYPE_CHECKING:
+    from app.state import ThemeContextValue
 
 Link = external("react-router-dom", "Link")
-create_actions = external("../actions.client", "createActions", alias="createActions")
-ApiClient = external("../api/client", "ApiClient")
+create_actions = external_fn("../actions.client", "createActions", alias="createActions")
+create_api_client = external_fn("../api/client", "createApiClient", alias="createApiClient")
 
 
 @component
 def Page():
-    theme: ThemeContextValue = use_context(ThemeContext)
+    theme: "ThemeContextValue" = use_context(ThemeContext)
     shared_count = use_app_store(lambda state: state.sharedCount)
     inc_shared = use_app_store(lambda state: state.incShared)
     message, set_message = use_state("Loading...")
     ping, set_ping = use_state("Loading...")
 
     actions = create_actions()
-    api = new_(ApiClient, {"baseUrl": ""})
+    api = create_api_client()
 
     def on_action(result):
         set_message(result.ok and result.data or "Error")
@@ -37,7 +44,7 @@ def Page():
         actions.AppActions.hello({"name": "Nestipy"}).then(on_action)
 
     def load_ping():
-        api.ping().then(on_ping)
+        api.App.ping().then(on_ping)
 
     reload_action = use_callback(load_action, deps=[])
     reload_ping = use_callback(load_ping, deps=[])

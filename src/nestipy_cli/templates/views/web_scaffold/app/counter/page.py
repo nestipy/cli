@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from nestipy.web import (
     component,
     h,
@@ -6,12 +10,15 @@ from nestipy.web import (
     use_callback,
     use_context,
 )
-from app.state import ThemeContext, ThemeContextValue, use_app_store
+from app.state import ThemeContext, use_app_store
+
+if TYPE_CHECKING:
+    from app.state import ThemeContextValue
 
 
 @component
 def Page():
-    theme: ThemeContextValue = use_context(ThemeContext)
+    theme: "ThemeContextValue" = use_context(ThemeContext)
     count, set_count = use_state(0)
     shared_count = use_app_store(lambda state: state.sharedCount)
     inc_shared = use_app_store(lambda state: state.incShared)
