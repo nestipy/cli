@@ -157,6 +157,21 @@ current_task = None
     help="Proxy URL for web dev server (defaults to backend address).",
 )
 @click.option(
+    "--ssr/--no-ssr",
+    default=False,
+    help="Enable optional SSR when serving web dist.",
+)
+@click.option(
+    "--ssr-runtime",
+    default=None,
+    help="SSR runtime (jsrun or node).",
+)
+@click.option(
+    "--ssr-entry",
+    default=None,
+    help="Path to SSR entry bundle (default: web/dist/ssr/entry-server.js).",
+)
+@click.option(
     "--action-security/--no-action-security",
     default=None,
     help="Enable or disable default action security presets.",
@@ -206,6 +221,9 @@ def start(
     web: bool,
     web_args: str,
     web_proxy: str | None,
+    ssr: bool,
+    ssr_runtime: str | None,
+    ssr_entry: str | None,
     action_security: bool | None,
     action_origins: str | None,
     action_allow_missing_origin: bool | None,
@@ -324,6 +342,12 @@ def start(
         ansi_re = re.compile(r"\x1b\[[0-9;]*m")
         if dev:
             os.environ["NESTIPY_WEB_DEV"] = "1"
+        if ssr:
+            os.environ["NESTIPY_WEB_SSR"] = "1"
+        if ssr_runtime:
+            os.environ["NESTIPY_WEB_SSR_RUNTIME"] = ssr_runtime
+        if ssr_entry:
+            os.environ["NESTIPY_WEB_SSR_ENTRY"] = ssr_entry
 
         def _strip_ansi(text: str) -> str:
             return ansi_re.sub("", text)
@@ -533,6 +557,10 @@ def start(
         )
         if not _has_flag(web_args_list, "--proxy") and not os.getenv("NESTIPY_WEB_PROXY"):
             web_args_list.extend(["--proxy", proxy_value])
+        if ssr and not _has_flag(web_args_list, "--ssr"):
+            web_args_list.append("--ssr")
+        if ssr_entry and not _has_flag(web_args_list, "--ssr-entry"):
+            web_args_list.extend(["--ssr-entry", ssr_entry])
         if not _has_flag(web_args_list, "--router-spec") and proxy_value:
             web_args_list.extend(["--router-spec", proxy_value.rstrip("/") + "/_router/spec"])
         os.environ.setdefault("NESTIPY_ROUTER_SPEC", "1")
