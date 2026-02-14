@@ -5,18 +5,16 @@ from nestipy.web import (
     use_effect,
     use_context,
     external,
-    external_fn,
     new_,
 )
-from app.layout import ThemeContext
+from app.state import ThemeContext, ThemeContextValue, use_app_store
 
 ApiClient = external("../../api/client", "ApiClient")
-use_app_store = external_fn("../../store", "useAppStore", alias="useAppStore")
 
 
 @component
 def Page():
-    theme = use_context(ThemeContext)
+    theme: ThemeContextValue = use_context(ThemeContext)
     status, set_status = use_state("Waiting...")
     shared_count = use_app_store(lambda state: state.sharedCount)
     inc_shared = use_app_store(lambda state: state.incShared)

@@ -59,6 +59,10 @@ class NestipyCliHandler:
         web_dir = os.path.join(destination, "web")
 
         self._write_template(
+            os.path.join(app_dir, "state.py"),
+            "web_scaffold/app/state.py",
+        )
+        self._write_template(
             os.path.join(app_dir, "layout.py"),
             "web_scaffold/app/layout.py",
         )

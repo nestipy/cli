@@ -3,6 +3,10 @@
 
 This project includes a Python-based frontend in `app/` plus a Vite scaffold in `web/`.
 
+Shared UI state lives in `app/state.py` so layouts and pages can import a single source for:
+- `ThemeContext` (typed `create_context`)
+- `use_app_store` (typed store selector wrapper)
+
 Build + run both backend and frontend:
 
 ```bash
