@@ -35,23 +35,27 @@ def Page():
 
     return h.section(
         h.div(
-            h.h2("API Playground", class_name="page-title"),
+            h.span("Typed client", class_name="pill pill-accent"),
+            h.h2("API playground", class_name="page-title"),
             h.p(
-                "Ping the backend using the generated typed client.",
+                "Call the backend through the generated client and keep responses typed.",
                 class_name="page-subtitle",
             ),
             class_name="page-header",
         ),
         h.div(
             h.p(status, class_name="card-title"),
-            h.button("Reload API", on_click=load_ping, class_name="btn"),
+            h.button("Reload API", on_click=load_ping, class_name="btn btn-primary"),
             class_name="card api-card",
         ),
         h.div(
-            h.span("Shared count", class_name="stat-label"),
-            h.span(shared_count, class_name="stat-value"),
+            h.div(
+                h.span("Shared count", class_name="stat-label"),
+                h.span(shared_count, class_name="stat-value"),
+                class_name="stat-card",
+            ),
             h.button("Inc Shared", on_click=inc_shared, class_name="btn btn-outline"),
-            class_name="stat-card",
+            class_name="stat-row",
         ),
         h.p(
             f"Theme: {theme['theme']}",
