@@ -49,10 +49,7 @@ def Page():
     reload_action = use_callback(load_action, deps=[])
     reload_ping = use_callback(load_ping, deps=[])
 
-    def label():
-        return f"Action says: {message}"
-
-    action_label = use_memo(label, deps=[message])
+    action_label = use_memo(lambda: f"Action says: {message}", deps=[message])
     use_effect(load_action, deps=[])
     use_effect(load_ping, deps=[])
 
@@ -86,6 +83,7 @@ def Page():
                 h.h3(item["title"], class_name="feature-title"),
                 h.p(item["desc"], class_name="feature-desc"),
                 class_name="card feature-card",
+                key=item["title"],
             )
         )
    
@@ -101,6 +99,7 @@ def Page():
                 h.span(item["label"], class_name="stat-label"),
                 h.span(item["value"], class_name="stat-value"),
                 class_name="stat-card",
+                key=item["label"],
             )
         )
 

@@ -367,6 +367,14 @@ def start(
                     return arg.split("=", 1)[1]
             return "app"
 
+        def _extract_flag_value(args: list[str], flag: str) -> str | None:
+            for i, arg in enumerate(args):
+                if arg == flag and i + 1 < len(args):
+                    return args[i + 1]
+                if arg.startswith(flag + "="):
+                    return arg.split("=", 1)[1]
+            return None
+
         # New helper functions
         def _handle_file_change(line: str) -> None:
             """Process file change events from Vite"""
@@ -517,12 +525,21 @@ def start(
             echo.info("[NESTIPY] INFO [WEB] Installing frontend dependencies...")
         if not _has_flag(web_args_list, "--actions"):
             web_args_list.append("--actions")
+        proxy_value = (
+            _extract_flag_value(web_args_list, "--proxy")
+            or os.getenv("NESTIPY_WEB_PROXY")
+            or web_proxy
+            or f"{scheme}://{host}:{selected_port}"
+        )
         if not _has_flag(web_args_list, "--proxy") and not os.getenv("NESTIPY_WEB_PROXY"):
-            proxy_value = web_proxy or f"{scheme}://{host}:{selected_port}"
             web_args_list.extend(["--proxy", proxy_value])
+        if not _has_flag(web_args_list, "--router-spec") and proxy_value:
+            web_args_list.extend(["--router-spec", proxy_value.rstrip("/") + "/_router/spec"])
+        os.environ.setdefault("NESTIPY_ROUTER_SPEC", "1")
         env = os.environ.copy()
         env["NESTIPY_WEB_BACKEND"] = ""
         env["NESTIPY_WEB_BACKEND_CWD"] = ""
+        env.setdefault("NESTIPY_ROUTER_SPEC", "1")
         actions_watch_paths: list[str] = []
         actions_watch_src = project_root / "src"
         if actions_watch_src.exists():
