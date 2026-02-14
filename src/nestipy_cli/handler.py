@@ -132,6 +132,10 @@ class NestipyCliHandler:
             "web_scaffold/web/src/actions.ts",
         )
         self._write_template(
+            os.path.join(web_dir, "src", "store.ts"),
+            "web_scaffold/web/src/store.ts",
+        )
+        self._write_template(
             os.path.join(web_dir, "src", "actions.client.ts"),
             "web_scaffold/web/src/actions.client.ts",
         )
