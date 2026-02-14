@@ -55,12 +55,19 @@ def main():
     default=False,
     help="Include Nestipy Web scaffold with hooks + actions example.",
 )
-def new(name, web: bool):
+@click.option(
+    "--ssr/--no-ssr",
+    default=False,
+    help="Include optional SSR scaffold (requires --web).",
+)
+def new(name, web: bool, ssr: bool):
     """Create new project"""
     # if not shutil.which('poetry'):
     # curl -sSL https://install.python-poetry.org | python3 -
     click.clear()
-    created = handler.create_project(name, web=web)
+    if ssr and not web:
+        web = True
+    created = handler.create_project(name, web=web, web_ssr=ssr)
     if not created:
         echo.error(f"Folder {name} already exist.")
         return
@@ -74,6 +81,13 @@ def new(name, web: bool):
             "\n\nFrontend dev (Vite + backend):"
             "\n\tnestipy start --dev --web --web-args \"--vite --install\""
         )
+        if ssr:
+            message += (
+                "\n\nSSR build + run:"
+                "\n\tpip install \"nestipy[web-ssr]\""
+                "\n\tnestipy run web:build --vite --ssr"
+                "\n\tnestipy start --web --ssr --ssr-runtime jsrun"
+            )
     echo.info(message)
     # else:
     #     echo.error(f"Nestipy need poetry as dependency manager.")

@@ -14,7 +14,7 @@ class NestipyCliHandler:
     def __init__(self):
         self.generator = TemplateGenerator()
 
-    def create_project(self, name, web: bool = False) -> bool:
+    def create_project(self, name, web: bool = False, web_ssr: bool = False) -> bool:
         destination = os.path.join(os.getcwd(), name)
         if name == ".":
             destination = os.getcwd()
@@ -25,7 +25,9 @@ class NestipyCliHandler:
             project_name = self._sanitize_package_name(os.path.basename(destination.rstrip(os.sep)))
             if not project_name:
                 project_name = self._sanitize_package_name("nestipy-app")
-            self._add_frontend_scaffold(destination, project_name=project_name)
+            self._add_frontend_scaffold(
+                destination, project_name=project_name, ssr_enabled=web_ssr
+            )
         return True
 
 
@@ -54,9 +56,12 @@ class NestipyCliHandler:
         with open(readme_path, "a", encoding="utf-8") as handle:
             handle.write(content)
 
-    def _add_frontend_scaffold(self, destination: str, project_name: str) -> None:
+    def _add_frontend_scaffold(
+        self, destination: str, project_name: str, ssr_enabled: bool = False
+    ) -> None:
         app_dir = os.path.join(destination, "app")
         web_dir = os.path.join(destination, "web")
+        ssr_line = "__ssr__ = True" if ssr_enabled else ""
 
         self._write_template(
             os.path.join(app_dir, "state.py"),
@@ -69,6 +74,7 @@ class NestipyCliHandler:
         self._write_template(
             os.path.join(app_dir, "page.py"),
             "web_scaffold/app/page.py",
+            ssr_line=ssr_line,
         )
         self._write_template(
             os.path.join(app_dir, "notfound.py"),
@@ -81,10 +87,12 @@ class NestipyCliHandler:
         self._write_template(
             os.path.join(app_dir, "counter", "page.py"),
             "web_scaffold/app/counter/page.py",
+            ssr_line=ssr_line,
         )
         self._write_template(
             os.path.join(app_dir, "api-call", "page.py"),
             "web_scaffold/app/api-call/page.py",
+            ssr_line=ssr_line,
         )
         self._write_template(
             os.path.join(app_dir, "api-call", "layout.py"),
@@ -173,8 +181,24 @@ class NestipyCliHandler:
         )
         self._append_readme(
             destination,
-            self.generator.render_template("web_scaffold/README.md"),
+            self.generator.render_template(
+                "web_scaffold/README.md",
+                ssr_block=_ssr_readme_block(ssr_enabled),
+            ),
         )
+
+
+def _ssr_readme_block(enabled: bool) -> str:
+    if not enabled:
+        return ""
+    return (
+        "\n\nOptional SSR (jsrun)\n"
+        "\n```bash\n"
+        "pip install \"nestipy[web-ssr]\"\n"
+        "nestipy run web:build --vite --ssr\n"
+        "nestipy start --web --ssr --ssr-runtime jsrun\n"
+        "```\n"
+    )
 
     @classmethod
     def mkdir(cls, name):

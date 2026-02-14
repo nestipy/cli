@@ -36,3 +36,5 @@ Then generate the typed client:
 ```bash
 nestipy run web:build --spec http://127.0.0.1:8000/_router/spec --lang ts --output web/src/api/client.ts
 ```
+
+{{ ssr_block }}

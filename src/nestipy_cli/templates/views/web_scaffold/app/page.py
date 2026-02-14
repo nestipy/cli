@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+{{ ssr_line }}
+
 from typing import TYPE_CHECKING
 
 from nestipy.web import (
