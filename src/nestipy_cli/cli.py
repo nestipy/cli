@@ -555,62 +555,58 @@ def start(
                 echo.info(f"[NESTIPY] INFO [WEB] {text}")
 
         # Your existing code continues...
-        web_args_list = shlex.split(web_args) if web_args else ["--vite"]
-        web_args_list = _strip_backend_flags(web_args_list)
-        web_app_dir = _extract_web_app_dir(web_args_list)
-        if "--install" in web_args_list:
-            show_web_install_log = True
-            echo.info("[NESTIPY] INFO [WEB] Installing frontend dependencies...")
-        if not _has_flag(web_args_list, "--actions"):
-            web_args_list.append("--actions")
-        proxy_value = (
-            _extract_flag_value(web_args_list, "--proxy")
-            or os.getenv("NESTIPY_WEB_PROXY")
-            or web_proxy
-            or f"{scheme}://{host}:{selected_port}"
-        )
-        if not _has_flag(web_args_list, "--proxy") and not os.getenv("NESTIPY_WEB_PROXY"):
-            web_args_list.extend(["--proxy", proxy_value])
-        if ssr and not _has_flag(web_args_list, "--ssr"):
-            web_args_list.append("--ssr")
-        if ssr_entry and not _has_flag(web_args_list, "--ssr-entry"):
-            web_args_list.extend(["--ssr-entry", ssr_entry])
-        if not _has_flag(web_args_list, "--router-spec") and proxy_value:
-            web_args_list.extend(["--router-spec", proxy_value.rstrip("/") + "/_router/spec"])
-        os.environ.setdefault("NESTIPY_ROUTER_SPEC", "1")
-        env = os.environ.copy()
-        env["NESTIPY_WEB_BACKEND"] = ""
-        env["NESTIPY_WEB_BACKEND_CWD"] = ""
-        env.setdefault("NESTIPY_ROUTER_SPEC", "1")
-        actions_watch_paths: list[str] = []
-        actions_watch_src = project_root / "src"
-        if actions_watch_src.exists():
-            actions_watch_paths.append(str(actions_watch_src))
-        has_root_py = any(project_root.glob("*.py"))
-        if has_root_py:
-            actions_watch_paths.append(str(project_root))
-        if not actions_watch_paths:
-            actions_watch_paths.append(str(project_root))
-        env.setdefault("NESTIPY_WEB_ACTIONS_WATCH", ",".join(actions_watch_paths))
-        web_process = subprocess.Popen(
-            ["nestipy", "run", "web:dev", *web_args_list],
-            cwd=str(module_file_path.parent),
-            env=env,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            bufsize=1,
-        )
-        if web_process.stdout is not None:
-            threading.Thread(target=_stream_web_logs, args=(web_process.stdout,), daemon=True).start()
-        if web_process.stderr is not None:
-            threading.Thread(target=_stream_web_logs, args=(web_process.stderr,), daemon=True).start()
-        atexit.register(lambda: web_process and web_process.terminate())
-        if web_process.stdout is not None:
-            threading.Thread(target=_stream_web_logs, args=(web_process.stdout,), daemon=True).start()
-        if web_process.stderr is not None:
-            threading.Thread(target=_stream_web_logs, args=(web_process.stderr,), daemon=True).start()
-        atexit.register(lambda: web_process and web_process.terminate())
+        if dev:
+            web_args_list = shlex.split(web_args) if web_args else ["--vite"]
+            web_args_list = _strip_backend_flags(web_args_list)
+            web_app_dir = _extract_web_app_dir(web_args_list)
+            if "--install" in web_args_list:
+                show_web_install_log = True
+                echo.info("[NESTIPY] INFO [WEB] Installing frontend dependencies...")
+            if not _has_flag(web_args_list, "--actions"):
+                web_args_list.append("--actions")
+            proxy_value = (
+                _extract_flag_value(web_args_list, "--proxy")
+                or os.getenv("NESTIPY_WEB_PROXY")
+                or web_proxy
+                or f"{scheme}://{host}:{selected_port}"
+            )
+            if not _has_flag(web_args_list, "--proxy") and not os.getenv("NESTIPY_WEB_PROXY"):
+                web_args_list.extend(["--proxy", proxy_value])
+            if ssr and not _has_flag(web_args_list, "--ssr"):
+                web_args_list.append("--ssr")
+            if ssr_entry and not _has_flag(web_args_list, "--ssr-entry"):
+                web_args_list.extend(["--ssr-entry", ssr_entry])
+            if not _has_flag(web_args_list, "--router-spec") and proxy_value:
+                web_args_list.extend(["--router-spec", proxy_value.rstrip("/") + "/_router/spec"])
+            os.environ.setdefault("NESTIPY_ROUTER_SPEC", "1")
+            env = os.environ.copy()
+            env["NESTIPY_WEB_BACKEND"] = ""
+            env["NESTIPY_WEB_BACKEND_CWD"] = ""
+            env.setdefault("NESTIPY_ROUTER_SPEC", "1")
+            actions_watch_paths: list[str] = []
+            actions_watch_src = project_root / "src"
+            if actions_watch_src.exists():
+                actions_watch_paths.append(str(actions_watch_src))
+            has_root_py = any(project_root.glob("*.py"))
+            if has_root_py:
+                actions_watch_paths.append(str(project_root))
+            if not actions_watch_paths:
+                actions_watch_paths.append(str(project_root))
+            env.setdefault("NESTIPY_WEB_ACTIONS_WATCH", ",".join(actions_watch_paths))
+            web_process = subprocess.Popen(
+                ["nestipy", "run", "web:dev", *web_args_list],
+                cwd=str(module_file_path.parent),
+                env=env,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                bufsize=1,
+            )
+            if web_process.stdout is not None:
+                threading.Thread(target=_stream_web_logs, args=(web_process.stdout,), daemon=True).start()
+            if web_process.stderr is not None:
+                threading.Thread(target=_stream_web_logs, args=(web_process.stderr,), daemon=True).start()
+            atexit.register(lambda: web_process and web_process.terminate())
     def _abs_path(value: str) -> str:
         if os.path.isabs(value):
             return value

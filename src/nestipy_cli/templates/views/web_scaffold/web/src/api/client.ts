@@ -39,3 +39,9 @@ export class ApiClient {
     return response.text();
   }
 }
+
+export function createApiClient(options: Partial<ClientOptions> = {}): ApiClient {
+  return new ApiClient({ baseUrl: '', ...options });
+}
+
+export const create_api_client = createApiClient;
