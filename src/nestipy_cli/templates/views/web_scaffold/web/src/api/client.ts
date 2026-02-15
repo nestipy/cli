@@ -9,15 +9,19 @@ export interface ClientOptions {
   headers?: Record<string, string>;
 }
 
-export class ApiClient {
+export class AppControllerApi {
   private _baseUrl: string;
   private _fetcher: FetchLike;
   private _headers: Record<string, string>;
 
-  constructor(options: ClientOptions) {
-    this._baseUrl = options.baseUrl.replace(/\/+$/, '');
-    this._fetcher = options.fetcher ?? globalThis.fetch.bind(globalThis);
-    this._headers = options.headers ?? {};
+  constructor(
+    baseUrl: string,
+    fetcher: FetchLike,
+    headers: Record<string, string>,
+  ) {
+    this._baseUrl = baseUrl;
+    this._fetcher = fetcher;
+    this._headers = headers;
   }
 
   private _joinUrl(path: string): string {
@@ -37,6 +41,22 @@ export class ApiClient {
       throw new Error(await response.text());
     }
     return response.text();
+  }
+}
+
+export class ApiClient {
+  private _baseUrl: string;
+  private _fetcher: FetchLike;
+  private _headers: Record<string, string>;
+  public readonly AppController: AppControllerApi;
+  public readonly App: AppControllerApi;
+
+  constructor(options: ClientOptions) {
+    this._baseUrl = options.baseUrl.replace(/\/+$/, '');
+    this._fetcher = options.fetcher ?? globalThis.fetch.bind(globalThis);
+    this._headers = options.headers ?? {};
+    this.AppController = new AppControllerApi(this._baseUrl, this._fetcher, this._headers);
+    this.App = this.AppController;
   }
 }
 
