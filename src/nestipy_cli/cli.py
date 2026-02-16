@@ -522,7 +522,7 @@ def start(
                             or "127.0.0.1" in url
                             or "0.0.0.0" in url
                         ):
-                            echo.info(f"[NESTIPY] INFO [WEB] Dev server: {url}")
+                            echo.success(f"[NESTIPY] INFO [WEB] Dev server: {url}")
                             if not web_dev_reported:
                                 # echo.info(
                                 #     f"[NESTIPY] INFO [WEB] Dev server running on: {url}"
@@ -581,9 +581,9 @@ def start(
                     or text.strip().startswith("Local:")
                     or text.strip().startswith("Network:")
                 ):
-                    echo.info(f"[NESTIPY] INFO [WEB] Dev server: {url}")
+                    echo.success(f"[NESTIPY] INFO [WEB] Dev server: {url}")
                     if not web_dev_reported and (is_local_line or is_network_line or "vite" in lower):
-                        echo.info(f"[NESTIPY] INFO [WEB] Dev server running on: {url}")
+                        echo.success(f"[NESTIPY] INFO [WEB] Dev server running on: {url}")
                     web_dev_reported = True
                     return
 
