@@ -64,8 +64,8 @@ class NestipyCliHandler:
         ssr_line = "__ssr__ = True" if ssr_enabled else ""
 
         self._write_template(
-            os.path.join(app_dir, "state.py"),
-            "web_scaffold/app/state.py",
+            os.path.join(app_dir, "store.py"),
+            "web_scaffold/app/store.py",
         )
         self._write_template(
             os.path.join(app_dir, "layout.py"),

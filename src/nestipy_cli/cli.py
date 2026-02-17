@@ -1,11 +1,13 @@
 import asyncio
 import importlib
+import json
 import sys
 import warnings
 import atexit
 import os
 import shlex
 import subprocess
+import shutil
 import threading
 import re
 import time
@@ -41,6 +43,64 @@ console = Console()
 
 handler = NestipyCliHandler()
 echo = CliStyle()
+
+
+def _resolve_web_dist(project_root: Path, web_dist: str | None) -> Path | None:
+    candidates: list[str] = []
+    if web_dist:
+        candidates.append(web_dist)
+    env_dist = os.getenv("NESTIPY_WEB_DIST")
+    if env_dist:
+        candidates.append(env_dist)
+    candidates.extend(["web/dist", "src/dist", "dist"])
+    for candidate in candidates:
+        if not candidate:
+            continue
+        path = Path(candidate)
+        if not path.is_absolute():
+            path = (project_root / path).resolve()
+        if path.is_dir():
+            return path
+    return None
+
+
+def _validate_web_dist(
+    dist_path: Path,
+    project_root: Path,
+    *,
+    ssr: bool,
+    ssr_entry: str | None,
+) -> list[str]:
+    errors: list[str] = []
+    if not dist_path.exists() or not dist_path.is_dir():
+        errors.append(f"Static dist directory not found: {dist_path}")
+        return errors
+    index_file = dist_path / "index.html"
+    if not index_file.is_file():
+        errors.append(f"Missing {index_file}.")
+    manifest_candidates = [
+        dist_path / "manifest.json",
+        dist_path / ".vite" / "manifest.json",
+    ]
+    if not any(path.exists() for path in manifest_candidates):
+        errors.append("Missing Vite manifest.json (run `nestipy run web:build`).")
+    if ssr:
+        entry_candidates: list[Path] = []
+        entry_hint = ssr_entry or os.getenv("NESTIPY_WEB_SSR_ENTRY")
+        if entry_hint:
+            entry_path = Path(entry_hint)
+            if entry_path.is_absolute():
+                entry_candidates.append(entry_path)
+            else:
+                entry_candidates.append((project_root / entry_path).resolve())
+                entry_candidates.append((dist_path / entry_path).resolve())
+        entry_candidates.append(dist_path / "ssr" / "entry-server.js")
+        if not any(path.exists() for path in entry_candidates):
+            errors.append(
+                "Missing SSR entry (expected dist/ssr/entry-server.js). "
+                "Rebuild with `nestipy run web:build --ssr`."
+            )
+    return errors
 
 
 @click.group(cls=ClickAliasedGroup)
@@ -92,6 +152,95 @@ def new(name, web: bool, ssr: bool):
     echo.info(message)
     # else:
     #     echo.error(f"Nestipy need poetry as dependency manager.")
+
+
+@main.command(name="doctor")
+@click.option(
+    "--path",
+    default=".",
+    help="Project root for web dependency checks (default: current directory).",
+)
+def doctor(path: str) -> None:
+    """Check environment requirements for Nestipy + Nestipy Web."""
+    root = Path(path).resolve()
+    errors = 0
+
+    echo.info("Nestipy doctor check")
+
+    py_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    if sys.version_info < (3, 11):
+        echo.error(f"[DOCTOR] Python {py_version} (requires >= 3.11)")
+        errors += 1
+    else:
+        echo.success(f"[DOCTOR] Python {py_version} OK")
+
+    try:
+        import nestipy  # type: ignore
+
+        version = getattr(nestipy, "__version__", "unknown")
+        echo.success(f"[DOCTOR] nestipy {version} OK")
+    except Exception as exc:
+        echo.error(f"[DOCTOR] nestipy import failed: {exc}")
+        errors += 1
+
+    try:
+        import granian  # type: ignore
+
+        version = getattr(granian, "__version__", "unknown")
+        echo.success(f"[DOCTOR] granian {version} OK")
+    except Exception as exc:
+        echo.warning(f"[DOCTOR] granian import failed: {exc}")
+
+    node_path = shutil.which("node")
+    if not node_path:
+        echo.error("[DOCTOR] Node.js not found (install Node 18+).")
+        errors += 1
+    else:
+        result = subprocess.run(
+            ["node", "--version"],
+            capture_output=True,
+            text=True,
+        )
+        node_version = (result.stdout or result.stderr or "").strip() or "unknown"
+        echo.success(f"[DOCTOR] Node {node_version} OK")
+
+    web_dir = root / "web"
+    if not web_dir.exists():
+        echo.warning(f"[DOCTOR] No web/ directory found at {web_dir}.")
+    else:
+        package_json = web_dir / "package.json"
+        if not package_json.exists():
+            echo.warning("[DOCTOR] web/package.json not found.")
+        else:
+            try:
+                payload = json.loads(package_json.read_text(encoding="utf-8"))
+            except Exception as exc:
+                echo.warning(f"[DOCTOR] Failed to read web/package.json: {exc}")
+                payload = {}
+            deps = payload.get("dependencies", {}) if isinstance(payload, dict) else {}
+            dev_deps = payload.get("devDependencies", {}) if isinstance(payload, dict) else {}
+            vite_version = None
+            if isinstance(dev_deps, dict):
+                vite_version = dev_deps.get("vite")
+            if not vite_version and isinstance(deps, dict):
+                vite_version = deps.get("vite")
+            if vite_version:
+                echo.success(f"[DOCTOR] Vite {vite_version} declared in package.json")
+            else:
+                echo.warning("[DOCTOR] Vite not listed in web/package.json")
+
+        vite_bin = web_dir / "node_modules" / ".bin" / "vite"
+        vite_pkg = web_dir / "node_modules" / "vite" / "package.json"
+        if vite_bin.exists() or vite_pkg.exists():
+            echo.success("[DOCTOR] Vite dependencies installed (node_modules present)")
+        else:
+            echo.warning(
+                "[DOCTOR] Vite dependencies not installed. "
+                "Run `nestipy run web:install` (or `npm install` in web/)."
+            )
+
+    if errors:
+        sys.exit(1)
 
 
 @main.group(cls=ClickAliasedGroup, name="generate", aliases=["g", "gen"])
@@ -159,12 +308,32 @@ current_task = None
     "--web",
     is_flag=True,
     default=False,
-    help="Start Nestipy Web dev server alongside the backend.",
+    help="Serve web dist in production; in dev also start Vite server.",
 )
 @click.option(
     "--web-args",
     default="",
-    help="Extra arguments passed to `nestipy run web:dev`.",
+    help="Extra arguments passed to `nestipy run web:dev` (dev only).",
+)
+@click.option(
+    "--web-dist",
+    default=None,
+    help="Path to built web dist directory (default: web/dist).",
+)
+@click.option(
+    "--web-path",
+    default=None,
+    help="Base path for serving static web assets.",
+)
+@click.option(
+    "--web-index",
+    default=None,
+    help="Index filename for SPA fallback (default: index.html).",
+)
+@click.option(
+    "--web-fallback/--no-web-fallback",
+    default=None,
+    help="Enable or disable SPA fallback to index.html.",
 )
 @click.option(
     "--web-proxy",
@@ -235,6 +404,10 @@ def start(
     reload_ignore_worker_failure: bool,
     web: bool,
     web_args: str,
+    web_dist: str | None,
+    web_path: str | None,
+    web_index: str | None,
+    web_fallback: bool | None,
     web_proxy: str | None,
     ssr: bool,
     ssr_runtime: str | None,
@@ -356,6 +529,35 @@ def start(
     log_config_path = write_logging_config(config)
     project_root = module_file_path.parent.resolve()
     cwd_root = Path.cwd().resolve()
+    if web:
+        if web_path:
+            os.environ["NESTIPY_WEB_STATIC_PATH"] = web_path
+        if web_index:
+            os.environ["NESTIPY_WEB_STATIC_INDEX"] = web_index
+        if web_fallback is not None:
+            os.environ["NESTIPY_WEB_STATIC_FALLBACK"] = "1" if web_fallback else "0"
+    if web and not dev:
+        dist_path = _resolve_web_dist(project_root, web_dist)
+        if dist_path is None:
+            echo.error("[NESTIPY] ERROR [WEB] Static dist directory not found.")
+            echo.info("[NESTIPY] INFO [WEB] Run `nestipy run web:build`.")
+            if ssr:
+                echo.info("[NESTIPY] INFO [WEB] For SSR: `nestipy run web:build --ssr`.")
+            return
+        errors = _validate_web_dist(
+            dist_path,
+            project_root,
+            ssr=ssr,
+            ssr_entry=ssr_entry,
+        )
+        if errors:
+            for error in errors:
+                echo.error(f"[NESTIPY] ERROR [WEB] {error}")
+            echo.info("[NESTIPY] INFO [WEB] Run `nestipy run web:build`.")
+            if ssr:
+                echo.info("[NESTIPY] INFO [WEB] For SSR: `nestipy run web:build --ssr`.")
+            return
+        os.environ["NESTIPY_WEB_DIST"] = str(dist_path)
     web_process = None
     web_app_dir = None
     if web:

@@ -68,6 +68,19 @@ Create a fullstack scaffold with the web UI:
     nestipy start --dev --web --web-args "--vite --install"
 ```
 
+Production static serving:
+
+```cmd
+    nestipy run web:build
+    nestipy start --web
+```
+
+Check environment health:
+
+```cmd
+    nestipy doctor
+```
+
 ### Nested Layouts
 
 You can add `layout.py` files in any folder under `app/`. The compiler nests
