@@ -18,7 +18,7 @@ from app.state import ThemeContext, use_app_store
 if TYPE_CHECKING:
     from app.state import ThemeContextValue
 
-create_api_client = external_fn("../../api/client", "createApiClient", alias="createApiClient")
+create_actions = external_fn("../../actions.client", "createActions", alias="createActions")
 
 
 @component
@@ -28,19 +28,19 @@ def Page():
     shared_count = use_app_store(lambda state: state.sharedCount)
     inc_shared = use_app_store(lambda state: state.incShared)
 
-    api = create_api_client()
+    actions = create_actions()
 
     def load_ping():
-        api.AppController.ping().then(lambda value: set_status(f"API ping: {value}"))
+        actions.AppActions.hello({"name": "Nestipy"}).then(lambda value: set_status(f"Action ping: {value.ok and value.data or value.error}"))
 
     use_effect(load_ping, deps=[])
 
     return h.section(
         h.div(
-            h.span("Typed client", class_name="pill pill-accent"),
-            h.h2("API playground", class_name="page-title"),
+            h.span("Action call", class_name="pill pill-accent"),
+            h.h2("Action playground", class_name="page-title"),
             h.p(
-                "Call the backend through the generated client and keep responses typed.",
+                "Call the backend through the generated actions and keep responses typed.",
                 class_name="page-subtitle",
             ),
             class_name="page-header",
@@ -48,11 +48,11 @@ def Page():
         h.div(
             h.span("Latest response", class_name="simple-label"),
             h.p(status, class_name="simple-status"),
-            h.button("Reload API", on_click=load_ping, class_name="btn btn-primary"),
+            h.button("Reload Action", on_click=load_ping, class_name="btn btn-primary"),
             class_name="simple-panel",
         ),
         h.div(
-            h.span("Shared count", class_name="simple-label"),
+            h.span("Shared count", class_name="simple-label"), 
             h.span(shared_count, class_name="simple-value"),
             h.button("Inc Shared", on_click=inc_shared, class_name="btn btn-outline"),
             class_name="simple-panel",

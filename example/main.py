@@ -6,9 +6,8 @@ app = NestipyFactory.create(AppModule)
 
 if __name__ == "__main__":
     app.listen(
-        "main:app",
         interface="asgi",
-        host="[IP_ADDRESS]",
+        host="0.0.0.0",
         port=8000,
         reload=True,
         log_level="critical",

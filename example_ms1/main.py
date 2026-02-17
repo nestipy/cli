@@ -14,7 +14,6 @@ app = NestipyFactory.create_microservice(
 # app.start_all_microservices()
 if __name__ == "__main__":
     app.listen(
-        "main:app",
         interface="asgi",
         host="0.0.0.0",
         port=8000,
