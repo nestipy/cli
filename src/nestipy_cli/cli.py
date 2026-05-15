@@ -1,16 +1,16 @@
 import asyncio
+import atexit
 import importlib
 import json
-import sys
-import warnings
-import atexit
 import os
-import shlex
-import subprocess
-import shutil
-import threading
 import re
+import shlex
+import shutil
+import subprocess
+import sys
+import threading
 import time
+import warnings
 from pathlib import Path
 from subprocess import DEVNULL, check_call
 from typing import Literal
@@ -111,6 +111,12 @@ def main():
 @main.command(aliases=["n"])
 @click.argument("name")
 @click.option(
+    "--full",
+    is_flag=True,
+    default=False,
+    help="Fullstack scaffold with database et auth.",
+)
+@click.option(
     "--web",
     is_flag=True,
     default=False,
@@ -121,14 +127,14 @@ def main():
     default=False,
     help="Include optional SSR scaffold (requires --web).",
 )
-def new(name, web: bool, ssr: bool):
+def new(name, full: bool, web: bool, ssr: bool):
     """Create new project"""
     # if not shutil.which('poetry'):
     # curl -sSL https://install.python-poetry.org | python3 -
     click.clear()
     if ssr and not web:
         web = True
-    created = handler.create_project(name, web=web, web_ssr=ssr)
+    created = handler.create_project(name, full=full, web=web, web_ssr=ssr)
     if not created:
         echo.error(f"Folder {name} already exist.")
         return
@@ -137,15 +143,14 @@ def new(name, web: bool, ssr: bool):
         f"\n\tuv sync \n\tnestipy start --dev"
     )
     if web:
-        show_web_install_log = os.getenv("NESTIPY_WEB_INSTALL_LOG", "0") in {"1", "true", "yes", "on"}
         message += (
             "\n\nFrontend dev (Vite + backend):"
-            "\n\tnestipy start --dev --web --web-args \"--vite --install\""
+            '\n\tnestipy start --dev --web --web-args "--vite --install"'
         )
         if ssr:
             message += (
                 "\n\nSSR build + run:"
-                "\n\tpip install \"nestipy[web-ssr]\""
+                '\n\tpip install "nestipy[web-ssr]"'
                 "\n\tnestipy run web:build --vite --ssr"
                 "\n\tnestipy start --web --ssr --ssr-runtime jsrun"
             )
@@ -167,7 +172,9 @@ def doctor(path: str) -> None:
 
     echo.info("Nestipy doctor check")
 
-    py_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    py_version = (
+        f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    )
     if sys.version_info < (3, 11):
         echo.error(f"[DOCTOR] Python {py_version} (requires >= 3.11)")
         errors += 1
@@ -218,7 +225,9 @@ def doctor(path: str) -> None:
                 echo.warning(f"[DOCTOR] Failed to read web/package.json: {exc}")
                 payload = {}
             deps = payload.get("dependencies", {}) if isinstance(payload, dict) else {}
-            dev_deps = payload.get("devDependencies", {}) if isinstance(payload, dict) else {}
+            dev_deps = (
+                payload.get("devDependencies", {}) if isinstance(payload, dict) else {}
+            )
             vite_version = None
             if isinstance(dev_deps, dict):
                 vite_version = dev_deps.get("vite")
@@ -446,7 +455,14 @@ def start(
                 stdout=DEVNULL,
             )
             check_call(
-                [sys.executable, "-m", "pip", "install", "granian[reload]", "--upgrade"],
+                [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "granian[reload]",
+                    "--upgrade",
+                ],
                 stdout=DEVNULL,
             )
             spinner.color = "green"
@@ -478,7 +494,7 @@ def start(
         return mod, app_
 
     m, app = import_app()
-    from nestipy.core import NestipyMicroservice, NestipyApplication
+    from nestipy.core import NestipyApplication, NestipyMicroservice
 
     is_ms: bool = isinstance(app, NestipyMicroservice) and not isinstance(
         app, NestipyApplication
@@ -542,7 +558,9 @@ def start(
             echo.error("[NESTIPY] ERROR [WEB] Static dist directory not found.")
             echo.info("[NESTIPY] INFO [WEB] Run `nestipy run web:build`.")
             if ssr:
-                echo.info("[NESTIPY] INFO [WEB] For SSR: `nestipy run web:build --ssr`.")
+                echo.info(
+                    "[NESTIPY] INFO [WEB] For SSR: `nestipy run web:build --ssr`."
+                )
             return
         errors = _validate_web_dist(
             dist_path,
@@ -555,7 +573,9 @@ def start(
                 echo.error(f"[NESTIPY] ERROR [WEB] {error}")
             echo.info("[NESTIPY] INFO [WEB] Run `nestipy run web:build`.")
             if ssr:
-                echo.info("[NESTIPY] INFO [WEB] For SSR: `nestipy run web:build --ssr`.")
+                echo.info(
+                    "[NESTIPY] INFO [WEB] For SSR: `nestipy run web:build --ssr`."
+                )
             return
         os.environ["NESTIPY_WEB_DIST"] = str(dist_path)
     web_process = None
@@ -632,7 +652,7 @@ def start(
         # New helper functions
         def _handle_file_change(line: str) -> None:
             """Process file change events from Vite"""
-            text = re.sub(r'\x1b\[[0-9;]*m', '', line).strip()
+            text = re.sub(r"\x1b\[[0-9;]*m", "", line).strip()
             match = re.search(r"\[vite\]\s+(.+)", text)
             if match:
                 payload = match.group(1).strip()
@@ -640,10 +660,10 @@ def start(
                     payload = payload.replace("(client)", "").strip()
                 lower_payload = payload.lower()
                 if lower_payload.startswith("hmr update"):
-                    payload = payload[len("hmr update"):].strip()
+                    payload = payload[len("hmr update") :].strip()
                     message = f"[NESTIPY] INFO [WEB] File changed HMR UPDATE {payload}"
                 elif lower_payload.startswith("page reload"):
-                    payload = payload[len("page reload"):].strip()
+                    payload = payload[len("page reload") :].strip()
                     message = f"[NESTIPY] INFO [WEB] File changed PAGE RELOAD {payload}"
                 else:
                     message = f"[NESTIPY] INFO [WEB] File changed {payload}"
@@ -662,7 +682,9 @@ def start(
             elif change_type == "✗":
                 change_type = "error"
 
-            message = f"[NESTIPY] INFO [WEB] File changed {change_type.upper()} {file_path}"
+            message = (
+                f"[NESTIPY] INFO [WEB] File changed {change_type.upper()} {file_path}"
+            )
             echo.info(message)
 
         def _handle_build_progress(line: str) -> None:
@@ -713,17 +735,17 @@ def start(
             lower = text.lower()
 
             if web_log_level != "verbose":
-                if lower.startswith("> ") or lower.startswith("vite v") or "press h + enter" in lower:
+                if (
+                    lower.startswith("> ")
+                    or lower.startswith("vite v")
+                    or "press h + enter" in lower
+                ):
                     return
                 if "local:" in lower or "network:" in lower:
                     match = re.search(r"(https?://\S+)", text)
                     if match and web_log_level != "silent":
                         url = match.group(1).rstrip(")")
-                        if (
-                            "localhost" in url
-                            or "127.0.0.1" in url
-                            or "0.0.0.0" in url
-                        ):
+                        if "localhost" in url or "127.0.0.1" in url or "0.0.0.0" in url:
                             echo.success(f"[NESTIPY] INFO [WEB] Dev server: {url}")
                             if not web_dev_reported:
                                 # echo.info(
@@ -732,7 +754,11 @@ def start(
                                 web_dev_reported = True
                     return
 
-            if lower.startswith("traceback") or "exception" in lower or "importerror" in lower:
+            if (
+                lower.startswith("traceback")
+                or "exception" in lower
+                or "importerror" in lower
+            ):
                 echo.error(f"[NESTIPY] ERROR [WEB] {text}")
                 return
             if text.lstrip().startswith('File "') or text.lstrip().startswith("File "):
@@ -743,7 +769,9 @@ def start(
                 payload = text[len("[NESTIPY] INFO [WEB]") :].strip()
                 payload_lower = payload.lower()
                 if web_log_level != "verbose":
-                    if payload_lower.startswith("> ") or payload_lower.startswith("vite v"):
+                    if payload_lower.startswith("> ") or payload_lower.startswith(
+                        "vite v"
+                    ):
                         return
                     if "press h + enter" in payload_lower:
                         return
@@ -756,7 +784,11 @@ def start(
                 echo.info(text)
                 return
 
-            if "audited" in lower or "packages are looking for funding" in lower or "found 0 vulnerabilities" in lower:
+            if (
+                "audited" in lower
+                or "packages are looking for funding" in lower
+                or "found 0 vulnerabilities" in lower
+            ):
                 return
             if show_web_install_log and (
                 "added" in lower
@@ -767,7 +799,11 @@ def start(
                 echo.info(f"[NESTIPY] INFO [WEB] {text}")
                 return
 
-            if web_log_level in {"quiet", "normal"} and text.startswith("VITE v") and "ready in" not in text:
+            if (
+                web_log_level in {"quiet", "normal"}
+                and text.startswith("VITE v")
+                and "ready in" not in text
+            ):
                 return
 
             match = re.search(r"(https?://\S+)", text)
@@ -784,8 +820,12 @@ def start(
                     or text.strip().startswith("Network:")
                 ):
                     echo.success(f"[NESTIPY] INFO [WEB] Dev server: {url}")
-                    if not web_dev_reported and (is_local_line or is_network_line or "vite" in lower):
-                        echo.success(f"[NESTIPY] INFO [WEB] Dev server running on: {url}")
+                    if not web_dev_reported and (
+                        is_local_line or is_network_line or "vite" in lower
+                    ):
+                        echo.success(
+                            f"[NESTIPY] INFO [WEB] Dev server running on: {url}"
+                        )
                     web_dev_reported = True
                     return
 
@@ -808,7 +848,11 @@ def start(
                     _handle_file_change(text)
                     return
 
-                if "transforming" in lower or "compiling" in lower or "building" in lower:
+                if (
+                    "transforming" in lower
+                    or "compiling" in lower
+                    or "building" in lower
+                ):
                     _handle_build_progress(text)
                     return
 
@@ -844,7 +888,9 @@ def start(
                     install_proc.stdout.close()
                 install_code = install_proc.wait()
                 if install_code != 0:
-                    echo.error("[NESTIPY] ERROR [WEB] Frontend dependency install failed.")
+                    echo.error(
+                        "[NESTIPY] ERROR [WEB] Frontend dependency install failed."
+                    )
                     return
                 echo.success("[NESTIPY] INFO [WEB] Frontend dependencies installed.")
                 web_args_list = [arg for arg in web_args_list if arg != "--install"]
@@ -856,14 +902,18 @@ def start(
                 or web_proxy
                 or f"{scheme}://{host}:{selected_port}"
             )
-            if not _has_flag(web_args_list, "--proxy") and not os.getenv("NESTIPY_WEB_PROXY"):
+            if not _has_flag(web_args_list, "--proxy") and not os.getenv(
+                "NESTIPY_WEB_PROXY"
+            ):
                 web_args_list.extend(["--proxy", proxy_value])
             if ssr and not _has_flag(web_args_list, "--ssr"):
                 web_args_list.append("--ssr")
             if ssr_entry and not _has_flag(web_args_list, "--ssr-entry"):
                 web_args_list.extend(["--ssr-entry", ssr_entry])
             if not _has_flag(web_args_list, "--router-spec") and proxy_value:
-                web_args_list.extend(["--router-spec", proxy_value.rstrip("/") + "/_router/spec"])
+                web_args_list.extend(
+                    ["--router-spec", proxy_value.rstrip("/") + "/_router/spec"]
+                )
             echo.info(
                 f"[NESTIPY] INFO [WEB] Starting dev server (nestipy run web:dev {' '.join(web_args_list)})"
             )
@@ -930,7 +980,9 @@ def start(
                         except Exception:
                             pass
 
-                threading.Thread(target=_stream_web_fd, args=(master_fd,), daemon=True).start()
+                threading.Thread(
+                    target=_stream_web_fd, args=(master_fd,), daemon=True
+                ).start()
             except Exception:
                 web_process = subprocess.Popen(
                     ["nestipy", "run", "web:dev", *web_args_list],
@@ -951,6 +1003,7 @@ def start(
                     ).start()
 
             if web_dev_fallback_url:
+
                 def _emit_web_dev_fallback() -> None:
                     nonlocal web_dev_reported
                     time.sleep(3)
@@ -961,14 +1014,19 @@ def start(
                         web_dev_reported = True
 
                 threading.Thread(target=_emit_web_dev_fallback, daemon=True).start()
+
             def _watch_web_process() -> None:
                 code = web_process.wait()
                 if code != 0:
-                    echo.error(f"[NESTIPY] ERROR [WEB] Dev server exited (code={code}).")
+                    echo.error(
+                        f"[NESTIPY] ERROR [WEB] Dev server exited (code={code})."
+                    )
                 else:
                     echo.info("[NESTIPY] INFO [WEB] Dev server stopped.")
+
             threading.Thread(target=_watch_web_process, daemon=True).start()
             atexit.register(lambda: web_process and web_process.terminate())
+
     def _abs_path(value: str) -> str:
         if os.path.isabs(value):
             return value

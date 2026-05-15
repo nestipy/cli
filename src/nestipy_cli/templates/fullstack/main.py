@@ -1,10 +1,10 @@
 import os
 
 from granian.constants import Interfaces
+
 from nestipy.common import logger
 from nestipy.core import NestipyConfig, NestipyFactory
 from nestipy.openapi import DocumentBuilder, SwaggerModule
-
 from src.app_module import AppModule
 
 document = (
@@ -14,7 +14,7 @@ document = (
         "Nestipy is a Python framework inspired by NestJS and built on top of FastAPI or Blacksheep"
     )
     .set_version("1.0")
-    # .add_bearer_auth()
+    .add_bearer_auth()
     # .add_basic_auth()
     .build()
 )

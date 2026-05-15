@@ -1,5 +1,6 @@
 import os.path
 import re
+from typing import Union
 
 import autoflake
 import autopep8
@@ -14,22 +15,25 @@ class NestipyCliHandler:
     def __init__(self):
         self.generator = TemplateGenerator()
 
-    def create_project(self, name, web: bool = False, web_ssr: bool = False) -> bool:
+    def create_project(
+        self, name, full: bool = False, web: bool = False, web_ssr: bool = False
+    ) -> bool:
         destination = os.path.join(os.getcwd(), name)
         if name == ".":
             destination = os.getcwd()
         if os.path.exists(destination) and name != ".":
             return False
-        self.generator.copy_project(destination)
+        project_name = self._sanitize_package_name(
+            os.path.basename(destination.rstrip(os.sep))
+        )
+        if not project_name:
+            project_name = self._sanitize_package_name("nestipy-app")
+        self.generator.copy_project(destination, project_name=project_name, full=full)
         if web:
-            project_name = self._sanitize_package_name(os.path.basename(destination.rstrip(os.sep)))
-            if not project_name:
-                project_name = self._sanitize_package_name("nestipy-app")
             self._add_frontend_scaffold(
                 destination, project_name=project_name, ssr_enabled=web_ssr
             )
         return True
-
 
     @staticmethod
     def _sanitize_package_name(name: str) -> str:
@@ -192,18 +196,17 @@ class NestipyCliHandler:
             ),
         )
 
-
-def _ssr_readme_block(enabled: bool) -> str:
-    if not enabled:
-        return ""
-    return (
-        "\n\nOptional SSR (jsrun)\n"
-        "\n```bash\n"
-        "pip install \"nestipy[web-ssr]\"\n"
-        "nestipy run web:build --vite --ssr\n"
-        "nestipy start --web --ssr --ssr-runtime jsrun\n"
-        "```\n"
-    )
+    def _ssr_readme_block(self, enabled: bool) -> str:
+        if not enabled:
+            return ""
+        return (
+            "\n\nOptional SSR (jsrun)\n"
+            "\n```bash\n"
+            'pip install "nestipy[web-ssr]"\n'
+            "nestipy run web:build --vite --ssr\n"
+            "nestipy start --web --ssr --ssr-runtime jsrun\n"
+            "```\n"
+        )
 
     @classmethod
     def mkdir(cls, name):
@@ -225,37 +228,37 @@ def _ssr_readme_block(enabled: bool) -> str:
         self.generate_resolver(name)
         self.generate_module(name, prefix="graphql")
 
-    def generate_command(self, name: str, prefix: str = None):
+    def generate_command(self, name: str, prefix: Union[str, None] = None):
         path = self.mkdir(name)
-        self.generate(name, path, "command", prefix=prefix)
+        self.generate(name, path, "command", prefix=prefix or "")
 
-    def generate_module(self, name: str, prefix: str = None):
+    def generate_module(self, name: str, prefix: Union[str, None] = None):
         path = self.mkdir(name)
-        self.generate(name, path, "module", prefix=prefix)
+        self.generate(name, path, "module", prefix=prefix or "")
         self.modify_app_module(name)
 
-    def generate_controller(self, name: str, prefix: str = None):
+    def generate_controller(self, name: str, prefix: Union[str, None] = None):
         path = self.mkdir(name)
-        self.generate(name, path, "controller", prefix=prefix)
+        self.generate(name, path, "controller", prefix=prefix or "")
 
-    def generate_service(self, name: str, prefix: str = None):
+    def generate_service(self, name: str, prefix: Union[str, None] = None):
         path = self.mkdir(name)
-        self.generate(name, path, "service", prefix=prefix)
+        self.generate(name, path, "service", prefix=prefix or "")
 
-    def generate_resolver(self, name: str, prefix: str = None):
+    def generate_resolver(self, name: str, prefix: Union[str, None] = None):
         path = self.mkdir(name)
-        self.generate(name, path, "resolver", prefix=prefix)
+        self.generate(name, path, "resolver", prefix=prefix or "")
 
-    def generate_dto(self, name: str, prefix: str = None):
+    def generate_dto(self, name: str, prefix: Union[str, None] = None):
         path = self.mkdir(name)
-        self.generate(name, path, "dto", prefix=prefix)
+        self.generate(name, path, "dto", prefix=prefix or "")
 
-    def generate_input(self, name: str, prefix: str = None):
+    def generate_input(self, name: str, prefix: Union[str, None] = None):
         path = self.mkdir(name)
-        self.generate(name, path, "input", prefix=prefix)
+        self.generate(name, path, "input", prefix=prefix or "")
 
-    def generate(self, name, parent_path, template, prefix: str = None):
-        pref = f"{f'{prefix}_' if prefix is not None else ''}"
+    def generate(self, name, parent_path, template, prefix: Union[str, None] = None):
+        pref = f"{f'{prefix}_' if prefix is not None and prefix != '' else ''}"
         content = self.generator.render_template(f"{pref}{template}.txt", name=name)
         file_path = str(os.path.join(parent_path, f"{name.lower()}_{template}.py"))
         f = open(file_path, "w+")
@@ -265,9 +268,9 @@ def _ssr_readme_block(enabled: bool) -> str:
     @classmethod
     def modify_app_module(cls, name):
         module_name = str(name).capitalize() + "Module"
-        app_path = os.path.join(os.getcwd(), "app_module.py")
+        app_path = os.path.join(os.getcwd(), "src", "app_module.py")
         new_import_statement = (
-            f"from src.{name.lower()}.{name.lower()}_module import {module_name}"
+            f"from .{name.lower()}.{name.lower()}_module import {module_name}"
         )
 
         if os.path.exists(app_path):

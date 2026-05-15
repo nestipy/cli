@@ -2,7 +2,7 @@ import asyncio
 import code
 import inspect
 from types import CodeType
-from typing import Type, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, Type, Union
 
 from .style import CliStyle
 
@@ -40,7 +40,7 @@ class REPL(code.InteractiveConsole):
                 if not name.startswith("_"):
                     echo.info("  ◻ {}".format(name))
 
-    def debug(self, module: Type = None, level: str = "  ") -> None:
+    def debug(self, module: Union[Type, None] = None, level: str = "  ") -> None:
         from nestipy.dynamic_module import DynamicModule
 
         if module is None:

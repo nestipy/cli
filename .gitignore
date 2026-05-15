@@ -5,3 +5,4 @@ venv
 *.cpyth
 .idea
 dist
+.ruff_cache

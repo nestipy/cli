@@ -46,9 +46,20 @@ class TemplateGenerator:
         shutil.copyfile(path, destination)
 
     @classmethod
-    def copy_project(cls, destination):
+    def copy_project(
+        cls, destination, project_name: str = "nestipy_app", full: bool = False
+    ):
         shutil.copytree(
-            os.path.join(os.path.dirname(__file__), "project"),
+            os.path.join(os.path.dirname(__file__), "fullstack" if full else "project"),
             destination,
             dirs_exist_ok=True,
         )
+        for root, dirs, files in os.walk(destination):
+            for file in files:
+                if file.endswith("pyproject.toml"):
+                    with open(os.path.join(root, file), "r", encoding="utf-8") as f:
+                        content = f.read()
+                    content = content.replace("nestipy_app", project_name)
+                    with open(os.path.join(root, file), "w", encoding="utf-8") as f:
+                        f.write(content)
+                    break

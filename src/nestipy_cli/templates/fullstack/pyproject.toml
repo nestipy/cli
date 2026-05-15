@@ -1,9 +1,11 @@
 [project]
-name = "nestipy_app"
+name = "fullstack"
 version = "0.0.1"
 dependencies = [
     "nestipy",
-    "granian[reload]"
+    "granian[reload]",
+    "nestipy_db",
+    "edgy[sqlite]"
 ]
 
 [tool.uv]
