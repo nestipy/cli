@@ -14,7 +14,8 @@ class CliStyle:
 
     @classmethod
     def warning(cls, info: Optional[Any] = None, **styles: dict):
-        click.secho(info, fg="orange", **styles)
+        # "orange" is not a valid click color; use bright_yellow for warnings.
+        click.secho(info, fg="bright_yellow", **styles)
 
     @classmethod
     def success(cls, info: Optional[Any] = None, **styles: dict):

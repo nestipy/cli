@@ -16,197 +16,32 @@ class NestipyCliHandler:
         self.generator = TemplateGenerator()
 
     def create_project(
-        self, name, full: bool = False, web: bool = False, web_ssr: bool = False
-    ) -> bool:
+        self, name, full: bool = False, fullstack: bool = False
+    ) -> Union[str, None]:
+        """Copy the backend scaffold. Returns the destination path, or None if it exists."""
         destination = os.path.join(os.getcwd(), name)
         if name == ".":
             destination = os.getcwd()
         if os.path.exists(destination) and name != ".":
-            return False
+            return None
         project_name = self._sanitize_package_name(
             os.path.basename(destination.rstrip(os.sep))
         )
         if not project_name:
             project_name = self._sanitize_package_name("nestipy-app")
-        self.generator.copy_project(destination, project_name=project_name, full=full)
-        if web:
-            self._add_frontend_scaffold(
-                destination, project_name=project_name, ssr_enabled=web_ssr
-            )
-        return True
+        self.generator.copy_project(
+            destination,
+            project_name=project_name,
+            full=full,
+            fullstack=fullstack,
+        )
+        return destination
 
     @staticmethod
     def _sanitize_package_name(name: str) -> str:
         cleaned = re.sub(r"[^a-zA-Z0-9._-]+", "-", name.strip())
         cleaned = cleaned.strip("-._")
         return cleaned or "nestipy-app"
-
-    def _write_file(self, path: str, content: str) -> None:
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, "w", encoding="utf-8") as handle:
-            handle.write(content)
-
-    def _write_template(self, path: str, template: str, **kwargs) -> None:
-        content = self.generator.render_template(template, **kwargs)
-        self._write_file(path, content)
-
-    def _copy_template(self, path: str, template: str) -> None:
-        self.generator.copy_template_file(template, path)
-
-    def _append_readme(self, destination: str, content: str) -> None:
-        readme_path = os.path.join(destination, "README.md")
-        if not os.path.exists(readme_path):
-            return
-        with open(readme_path, "a", encoding="utf-8") as handle:
-            handle.write(content)
-
-    def _add_frontend_scaffold(
-        self, destination: str, project_name: str, ssr_enabled: bool = False
-    ) -> None:
-        app_dir = os.path.join(destination, "app")
-        web_dir = os.path.join(destination, "web")
-        ssr_line = "__ssr__ = True" if ssr_enabled else ""
-
-        self._write_template(
-            os.path.join(app_dir, "store.py"),
-            "web_scaffold/app/store.py",
-        )
-        self._write_template(
-            os.path.join(app_dir, "layout.py"),
-            "web_scaffold/app/layout.py",
-        )
-        self._write_template(
-            os.path.join(app_dir, "page.py"),
-            "web_scaffold/app/page.py",
-            ssr_line=ssr_line,
-        )
-        self._write_template(
-            os.path.join(app_dir, "notfound.py"),
-            "web_scaffold/app/notfound.py",
-        )
-        self._write_template(
-            os.path.join(app_dir, "error.py"),
-            "web_scaffold/app/error.py",
-        )
-        self._write_template(
-            os.path.join(app_dir, "counter", "page.py"),
-            "web_scaffold/app/counter/page.py",
-            ssr_line=ssr_line,
-        )
-        self._write_template(
-            os.path.join(app_dir, "api-call", "page.py"),
-            "web_scaffold/app/api-call/page.py",
-            ssr_line=ssr_line,
-        )
-        self._write_template(
-            os.path.join(app_dir, "api-call", "layout.py"),
-            "web_scaffold/app/api-call/layout.py",
-        )
-        self._write_template(
-            os.path.join(app_dir, "action-call", "page.py"),
-            "web_scaffold/app/action-call/page.py",
-            ssr_line=ssr_line,
-        )
-        self._write_template(
-            os.path.join(destination, "app_actions.py"),
-            "web_scaffold/app_actions.py",
-        )
-        self._write_template(
-            os.path.join(destination, "app_controller.py"),
-            "web_scaffold/app_controller.py",
-        )
-        self._write_template(
-            os.path.join(destination, "app_service.py"),
-            "web_scaffold/app_service.py",
-        )
-        self._write_template(
-            os.path.join(destination, "app_module.py"),
-            "web_scaffold/app_module.py",
-        )
-        self._write_template(
-            os.path.join(web_dir, "index.html"),
-            "web_scaffold/web/index.html",
-        )
-        self._write_template(
-            os.path.join(web_dir, "package.json"),
-            "web_scaffold/web/package.json",
-            project_name=project_name,
-        )
-        self._write_template(
-            os.path.join(web_dir, "vite.config.ts"),
-            "web_scaffold/web/vite.config.ts",
-        )
-        self._write_template(
-            os.path.join(web_dir, "tsconfig.json"),
-            "web_scaffold/web/tsconfig.json",
-        )
-        self._write_template(
-            os.path.join(web_dir, "tsconfig.node.json"),
-            "web_scaffold/web/tsconfig.node.json",
-        )
-        self._write_template(
-            os.path.join(web_dir, "src", "vite-env.d.ts"),
-            "web_scaffold/web/src/vite-env.d.ts",
-        )
-        self._write_template(
-            os.path.join(web_dir, "src", "actions.ts"),
-            "web_scaffold/web/src/actions.ts",
-        )
-        self._write_template(
-            os.path.join(web_dir, "src", "store.ts"),
-            "web_scaffold/web/src/store.ts",
-        )
-        self._write_template(
-            os.path.join(web_dir, "src", "actions.client.ts"),
-            "web_scaffold/web/src/actions.client.ts",
-        )
-        self._write_template(
-            os.path.join(web_dir, "src", "api", "client.ts"),
-            "web_scaffold/web/src/api/client.ts",
-        )
-        self._write_template(
-            os.path.join(web_dir, "src", "index.css"),
-            "web_scaffold/web/src/index.css",
-        )
-        self._write_template(
-            os.path.join(web_dir, "src", "routes.tsx"),
-            "web_scaffold/web/src/routes.tsx",
-        )
-        self._write_template(
-            os.path.join(web_dir, "src", "main.tsx"),
-            "web_scaffold/web/src/main.tsx",
-        )
-        self._copy_template(
-            os.path.join(web_dir, "public", "nestipy.png"),
-            "web_scaffold/web/public/nestipy.png",
-        )
-        self._write_template(
-            os.path.join(web_dir, "public", "react.svg"),
-            "web_scaffold/web/public/react.svg",
-        )
-        self._write_template(
-            os.path.join(web_dir, "public", "vite.svg"),
-            "web_scaffold/web/public/vite.svg",
-        )
-        self._append_readme(
-            destination,
-            self.generator.render_template(
-                "web_scaffold/README.md",
-                ssr_block=_ssr_readme_block(ssr_enabled),
-            ),
-        )
-
-    def _ssr_readme_block(self, enabled: bool) -> str:
-        if not enabled:
-            return ""
-        return (
-            "\n\nOptional SSR (jsrun)\n"
-            "\n```bash\n"
-            'pip install "nestipy[web-ssr]"\n'
-            "nestipy run web:build --vite --ssr\n"
-            "nestipy start --web --ssr --ssr-runtime jsrun\n"
-            "```\n"
-        )
 
     @classmethod
     def mkdir(cls, name):

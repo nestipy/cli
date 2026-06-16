@@ -2,7 +2,7 @@ import os
 
 from granian.constants import Interfaces
 
-from nestipy.common import logger
+from nestipy.common import logger, session
 from nestipy.core import NestipyConfig, NestipyFactory
 from nestipy.openapi import DocumentBuilder, SwaggerModule
 from src.app_module import AppModule
@@ -22,6 +22,10 @@ document = (
 app = NestipyFactory.create(AppModule, config=NestipyConfig(profile=True))
 SwaggerModule.setup("docs", app, document)
 app.use_static_assets(os.path.join(os.path.dirname(__file__), "public"))
+
+# Inertia root template (views/index.html) + session for flash/validation errors
+app.set_base_view_dir(os.path.join(os.path.dirname(__file__), "views"))
+app.use(session())
 
 
 @app.on_startup

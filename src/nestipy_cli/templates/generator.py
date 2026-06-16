@@ -47,10 +47,20 @@ class TemplateGenerator:
 
     @classmethod
     def copy_project(
-        cls, destination, project_name: str = "nestipy_app", full: bool = False
+        cls,
+        destination,
+        project_name: str = "nestipy_app",
+        full: bool = False,
+        fullstack: bool = False,
     ):
+        if fullstack:
+            template_dir = "inertia"
+        elif full:
+            template_dir = "fullstack"
+        else:
+            template_dir = "project"
         shutil.copytree(
-            os.path.join(os.path.dirname(__file__), "fullstack" if full else "project"),
+            os.path.join(os.path.dirname(__file__), template_dir),
             destination,
             dirs_exist_ok=True,
         )

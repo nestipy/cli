@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.env
+
+# Node / Vite
+inertia/node_modules/
+inertia/dist/
+node_modules/
+
+# Logs
+logs/*.log

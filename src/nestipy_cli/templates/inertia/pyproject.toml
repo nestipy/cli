@@ -4,10 +4,7 @@ version = "0.0.1"
 dependencies = [
     "nestipy",
     "granian[reload]",
-    "nestipy-db",
-    "nestipy-jwt",
     "nestipy-inertia",
-    "edgy[sqlite]",
 ]
 
 [tool.uv]
